@@ -14,9 +14,9 @@ To use the application:
       ./setup.rb {PATH} {install | uninstall}
       
       where
-        PATH:       is the target Rails 2.3.5 application to link to DDE2
-        install:    is the option to choose when installing the additions
-        uninstall:  is the option for removing the changes that were effected 
+        { PATH }:       is the target Rails 2.3.5 application to link to DDE2;
+        { install }:    is the option to choose when installing the additions;
+        { uninstall }:  is the option for removing the changes that were effected 
                       and restore to original form. This step assumes all files 
                       created by the installer are not tampered with.
                       
