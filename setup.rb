@@ -53,7 +53,6 @@ def install(root)
       "app/views/layouts/ts.html.erb",
       "app/views/dde/edit_demographics.html.erb",
       "app/views/dde/edit_patient.html.erb",
-      "app/views/dde/index.html.erb",
       "app/views/dde/new_patient.html.erb",
       "app/views/dde/patient_not_found.html.erb",
       "app/views/dde/process_result.html.erb",
@@ -62,8 +61,9 @@ def install(root)
       "app/controllers/dde_controller.rb",
       "config/dde_connection.yml.example",
       "lib/dde.rb"
-    ]
-  
+    ]  
+    # "app/views/dde/index.html.erb",
+      
   if !File.exists?("#{root}/app/views/dde")
     print "Creating folder #{root}/app/views/dde ..."
     
@@ -96,7 +96,35 @@ def install(root)
 
   modify_routes(root)
 
+  modify_clinic_index_page(root)  
+
+  puts ""
+  
   puts "Installation DONE!"
+  
+  puts ""
+  
+  puts "======================================================================================================="
+  
+  puts ""
+  
+  puts "MANUAL TASK:"
+  
+  puts "============"
+  
+  puts ""  
+  
+  puts "\tYou now have to modify your patient demographics update page link to point to\n "
+  
+  puts "\t\t'/dde/edit_demographics'\n\n"
+  
+  puts "\tto make it possible to share your demographics updates with DDE that are made locally."
+  
+  puts ""
+  
+  puts "======================================================================================================="
+  
+  puts ""
   
 end
 
@@ -358,7 +386,131 @@ def uninstall(root)
 
     puts "Routes restoration result is ... OK" if result
   end
+  
+  restore_clinic_index(root)
+  
+  restore_clinic_index(root)
+  
   puts "Removal DONE!"
+  
+end
+
+def modify_clinic_index_page(root)
+
+  file = nil
+  
+  if File.exists?("#{root}/app/views/clinic/index.html.erb")
+  
+    file = "#{root}/app/views/clinic/index.html.erb"
+  
+  elsif File.exists?("#{root}/app/views/clinic/index.rhtml")
+  
+    file = "#{root}/app/views/clinic/index.rhtml"
+  
+  end
+
+  if !file.nil?
+    
+    puts "Found index file as '#{file}' ..."
+    
+    pattern = file.match(/(.+)\.(rhtml|html\.erb)$/)
+    
+    if !pattern.nil?
+       
+       if !File.exists?(pattern[1] + ".backup." + pattern[2])
+       
+          File.rename(file, pattern[1] + ".backup." + pattern[2])
+          
+          newfile = pattern[1] + ".backup." + pattern[2]
+          
+          string = ""
+          
+          inserted = false
+          
+          stub = File.open("app/views/dde/index.html.erb", "r").read rescue nil
+          
+          if stub.nil?
+          
+            puts "File 'app/views/dde/index.html.erb' not found."
+            
+            exit
+          
+          end
+          
+          print "Working ..."
+          
+          File.open(newfile, "r").each do |line|
+          
+            print "."
+          
+            # Point the 'Find or Register' button to a custom DDE method
+            line = line.gsub(/\/people\/search/, "/dde/search") if line.match(/\/people\/search/)
+            
+            if line.match(/\<\/body\>/i) and !inserted
+            
+              string = string + stub
+              
+              inserted = true
+            
+            end
+            
+            string = string + line
+          
+          end
+        
+          if !inserted
+                      
+              string = string + stub
+              
+              inserted = true            
+          
+          end
+        
+          hnd = File.open("#{root}/app/views/dde/index.#{pattern[2]}", "w")
+          
+          hnd.write(string)
+          
+          hnd.close
+       
+          puts " OK"
+       
+       end
+        
+    end
+  
+  end
+
+end
+
+def restore_clinic_index(root)
+  
+  file = nil
+  
+  if File.exists?("#{root}/app/views/clinic/index.backup.html.erb")
+  
+    file = "#{root}/app/views/clinic/index.backup.html.erb"
+  
+  elsif File.exists?("#{root}/app/views/clinic/index.backup.rhtml")
+  
+    file = "#{root}/app/views/clinic/index.backup.rhtml"
+  
+  end
+
+  if !file.nil?
+  
+    pattern = file.match(/(.+)\.backup\.(rhtml|html\.erb)$/)
+    
+    if !pattern.nil?  
+         
+      File.rename(file, pattern[1] + "." + pattern[2])
+      
+    end
+         
+    return true
+    
+  end
+  
+  return false
   
 end
 
