@@ -572,12 +572,14 @@ class DdeController < ApplicationController
     
     @results = []
     
+    settings = YAML.load_file("#{Rails.root}/config/dde_connection.yml")[Rails.env] rescue {}
+    
     target = params[:target]
     
     target = "update" if target.blank?
     
     if !@json.blank?    
-      @results = RestClient.post("http://#{settings["dde_username"]}:#{settings["dde_password"]}@#{settings["dde_server"]}/process_confirmation", {:person => person, :target => target}, {:accept => :json})    
+      @results = RestClient.post("http://#{settings["dde_username"]}:#{settings["dde_password"]}@#{settings["dde_server"]}/process_confirmation", {:person => @json, :target => target}, {:accept => :json})    
     end
     
     render :text => @results  
@@ -705,6 +707,18 @@ class DdeController < ApplicationController
     end
 
     render :text => result.to_json
+  end
+  
+  def send_to_dde
+  
+    @json = JSON.parse(params[:person]) rescue {}
+  
+    @settings = YAML.load_file("#{Rails.root}/config/dde_connection.yml")[Rails.env] # rescue {}
+    
+    @results = RestClient.post("http://#{(@settings["dde_username"])}:#{(@settings["dde_password"])}@#{(@settings["dde_server"])}/ajax_process_data", {"person" => params["person"]})
+    
+    render :layout => "ts"
+    
   end
   
 end

@@ -401,7 +401,7 @@
   
 <% end %>
 
-<% form_tag("http://#{(@settings["dde_username"])}:#{(@settings["dde_password"])}@#{(@settings["dde_server"])}/process_data", "method" => 'post', "enctype" => 'multipart/form-data', 
+<% form_tag("/dde/send_to_dde", "method" => 'post', "enctype" => 'multipart/form-data', 
           "id" => 'creation', "class" => "form-horizontal", "autocomplete" => "off", "role" => "form", "novalidate" => "novalidate") do %>
              
       <textarea id="person" name="person" style="display: none;" condition="false"></textarea>      
