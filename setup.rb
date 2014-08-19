@@ -347,6 +347,7 @@ def uninstall(root)
       "app/views/dde/process_result.html.erb",
       "app/views/dde/process_scan_data.html.erb",
       "app/views/dde/search.html.erb",
+      "app/views/dde/send_to_dde.html.erb",
       "app/controllers/dde_controller.rb",
       "config/dde_connection.yml.example",
       "lib/dde.rb"
