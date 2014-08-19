@@ -478,15 +478,22 @@
       }
              
       if(__$("btnUpdate")){
-        __$("btnUpdate").className = "button_blue";
-        __$("btnUpdate").setAttribute("pos", pos);
-        
-        __$("btnUpdate").onclick = function(){
-          var obj = JSON.parse(people[parseInt(this.getAttribute("pos"))]);      
+      
+        var obj = JSON.parse(people[parseInt(this.getAttribute("pos"))]);      
           
-          json["national_id"] = obj["_id"];
+        if(obj["_id"] != null){
+            
+          __$("btnUpdate").className = "button_blue";
+          __$("btnUpdate").setAttribute("pos", pos);
           
-          ajaxProcessRequest("update");
+          __$("btnUpdate").onclick = function(){
+            var obj = JSON.parse(people[parseInt(this.getAttribute("pos"))]);      
+            
+            json["national_id"] = obj["_id"];
+            
+            ajaxProcessRequest("update");
+          }
+          
         }
       }
               
