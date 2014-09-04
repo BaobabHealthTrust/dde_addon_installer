@@ -221,7 +221,7 @@ def modify_routes(root)
         
           puts "Inserting custom block ..."
         
-          input = File.open("config/routes.rb", "r").read
+          input = File.open("config/routes.rb.additions", "r").read
           
           string = string + input
         
@@ -237,7 +237,7 @@ def modify_routes(root)
         
           puts "Inserting custom block ..."
         
-          input = File.open("config/routes.rb", "r").read
+          input = File.open("config/routes.rb.additions", "r").read
           
           string = string + input
         
@@ -348,6 +348,7 @@ def uninstall(root)
       "app/views/dde/process_scan_data.html.erb",
       "app/views/dde/search.html.erb",
       "app/views/dde/send_to_dde.html.erb",
+      "app/views/dde/duplicates.html.erb",
       "app/controllers/dde_controller.rb",
       "config/dde_connection.yml.example",
       "lib/dde.rb"
