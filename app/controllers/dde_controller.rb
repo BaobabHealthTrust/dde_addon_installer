@@ -721,4 +721,166 @@ class DdeController < ApplicationController
     
   end
   
+  def duplicates
+    render :layout => false
+  end
+  
+  def search_by_name
+  
+    results = []
+      
+    people = PersonName.find(:all, :conditions => ["CONCAT(given_name, ' ', family_name) LIKE ?", "#{params["search"].strip}%"]) rescue []
+    
+    people.each do |person|
+    
+      record = {}
+      
+      record["patient"] = {} if record["patient"].nil?
+      
+      record["patient"]["identifiers"] = [] if record["patient"]["identifiers"].nil?
+        
+      person.person.patient.patient_identifiers.each do |ids|
+      
+        if record["National ID"].nil? and (ids.type.name.downcase == "national id" rescue false)
+        
+          record["National ID"] = ids.identifier rescue nil
+        
+        else 
+        
+          record["patient"]["identifiers"] << {ids.type.name => ids.identifier} rescue nil
+        
+        end
+      
+      end rescue nil
+    
+      record["names"] = {} if record["names"].nil?
+    
+      record["names"]["Given Name"] = person.given_name rescue nil
+      
+      record["names"]["Family Name"] = person.family_name rescue nil
+    
+      record["names"]["Middle Name"] = person.middle_name rescue nil
+    
+      record["Current Residence"] = person.addresses.first.address1 rescue nil
+      
+      record["Current Village"] = person.addresses.first.city_village rescue nil
+      
+      record["Current T/A"] = person.addresses.first.county_district rescue nil
+      
+      record["Current District"] = person.addresses.first.state_province rescue nil
+      
+      record["Home Village"] = person.addresses.first.neighborhood_cell rescue nil
+      
+      record["Home T/A"] = person.addresses.first.township_division rescue nil
+      
+      record["Home District"] = person.addresses.first.address2 rescue nil
+      
+      record["Gender"] = person.person.gender rescue nil
+      
+      record["Birthdate"] = person.person.birthdate rescue nil
+      
+      record["Birthdate Estimated"] = person.person.birthdate_estimated rescue nil
+      
+      attributes = ["Citizenship", "Occupation", "Home Phone Number", "Cell Phone Number", "Office Phone Number", "Race"]
+      
+      attributes.each do |a|
+      
+        record[a] = nil
+      
+      end
+      
+      person.person.person_attributes.each do |attribute|
+           
+          record[attribute.type.name] = attribute.value if attributes.include?(attribute.type.name)
+      
+      end
+    
+      results << record
+      
+    end  
+      
+    render :text => results.uniq.to_json
+  
+  end
+  
+  def search_by_id
+      
+    results = []
+      
+    identifiers = PatientIdentifier.find(:all, :conditions => ["identifier = ?", params["search"]]) rescue []
+    
+    identifiers.each do |identifier|
+    
+      person = identifier.patient.person.names.first
+    
+      record = {}
+      
+      record["patient"] = {} if record["patient"].nil?
+      
+      record["patient"]["identifiers"] = [] if record["patient"]["identifiers"].nil?
+        
+      identifier.patient.patient_identifiers.each do |ids|
+      
+        if record["National ID"].nil? and (ids.type.name.downcase == "national id" rescue false)
+        
+          record["National ID"] = ids.identifier rescue nil
+        
+        else 
+        
+          record["patient"]["identifiers"] << {ids.type.name => ids.identifier} rescue nil
+        
+        end
+      
+      end rescue nil
+    
+      record["names"] = {} if record["names"].nil?
+    
+      record["names"]["Given Name"] = person.given_name rescue nil
+      
+      record["names"]["Family Name"] = person.family_name rescue nil
+    
+      record["names"]["Middle Name"] = person.middle_name rescue nil
+    
+      record["Current Residence"] = identifier.patient.person.addresses.first.address1 rescue nil
+      
+      record["Current Village"] = identifier.patient.person.addresses.first.city_village rescue nil
+      
+      record["Current T/A"] = identifier.patient.person.addresses.first.county_district rescue nil
+      
+      record["Current District"] = identifier.patient.person.addresses.first.state_province rescue nil
+      
+      record["Home Village"] = identifier.patient.person.addresses.first.neighborhood_cell rescue nil
+      
+      record["Home T/A"] = identifier.patient.person.addresses.first.township_division rescue nil
+      
+      record["Home District"] = identifier.patient.person.addresses.first.address2 rescue nil
+      
+      record["Gender"] = identifier.patient.person.gender rescue nil
+      
+      record["Birthdate"] = identifier.patient.person.birthdate rescue nil
+      
+      record["Birthdate Estimated"] = identifier.patient.person.birthdate_estimated rescue nil
+      
+      attributes = ["Citizenship", "Occupation", "Home Phone Number", "Cell Phone Number", "Office Phone Number", "Race"]
+      
+      attributes.each do |a|
+      
+        record[a] = nil
+      
+      end
+      
+      identifier.patient.person.person_attributes.each do |attribute|
+           
+          record[attribute.type.name] = attribute.value if attributes.include?(attribute.type.name)
+      
+      end
+    
+      results << record
+      
+    end  
+      
+    render :text => results.uniq.to_json
+  
+  end
+  
 end

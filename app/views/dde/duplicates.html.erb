@@ -301,8 +301,8 @@
 			
 			var globalPeople = [];
 			
-			var globalSearchURL = "/duplicates/data/data.json";
-			var globalBarcodeSearchURL = "/duplicates/data/barcode.json";
+			var globalSearchURL = "/dde_search_by_name";
+			var globalBarcodeSearchURL = "/dde_search_by_id";
 						
 			var barcodeTimerHnd;
 			var timerSpacing = 1000;			
@@ -312,14 +312,23 @@
 			var fields = [
 					"Identifiers", 
 					"Given Name", 
+					"Middle Name",
 					"Family Name", 
 					"Gender", 
+					"Birthdate",
+					"Birthdate Estimated",
 					"Current Residence", 
 					"Current T/A", 
 					"Current District", 
 					"Home Village", 
 					"Home T/A", 
-					"Home District"
+					"Home District", 
+					"Occupation", 
+					"Home Phone Number", 
+					"Cell Phone Number", 
+					"Office Phone Number",
+					"Citizenship", 
+					"Race"
 				];
 						
 			function __$(id){
@@ -616,6 +625,8 @@
 						
 					}
 				
+					var branch = (this.getAttribute("target").match(/primary/i) ? "Primary" : "Secondary");
+					
 					if(this.innerHTML.trim().length == 0){
 						
 						var tick = document.createElement("img");
@@ -625,6 +636,10 @@
 						this.appendChild(tick);
 						
 						if(__$(this.getAttribute("target"))){
+							
+							__$(this.getAttribute("target")).setAttribute("tag", "Scan " + (branch == "Primary" ? "Primary" : "Secondary") + " Patient Barcode");
+							
+							__$(this.getAttribute("target")).value = "Scan " + (branch == "Primary" ? "Primary" : "Secondary") + " Patient Barcode";
 						
 							globalTarget = __$(this.getAttribute("target"));
 						
@@ -670,6 +685,8 @@
 								
 							}
 						
+							__$(this.getAttribute("target")).className = "text";
+						
 							barcodeTimerHnd = setTimeout("checkBarcode()", 1);
 							
 						}
@@ -677,6 +694,16 @@
 					} else {
 						
 						this.innerHTML = "";
+						
+						if(__$(this.getAttribute("target"))){
+							
+							__$(this.getAttribute("target")).setAttribute("tag", "Select " + (branch == "Primary" ? "Primary" : "Secondary") + " Patient");
+							
+							__$(this.getAttribute("target")).value = "Select " + (branch == "Primary" ? "Primary" : "Secondary") + " Patient";
+							
+							__$(this.getAttribute("target")).className = "placeholder";
+							
+						}
 						
 					}
 					

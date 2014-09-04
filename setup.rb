@@ -59,6 +59,7 @@ def install(root)
       "app/views/dde/process_scan_data.html.erb",
       "app/views/dde/search.html.erb",
       "app/views/dde/send_to_dde.html.erb",
+      "app/views/dde/duplicates.html.erb",
       "app/controllers/dde_controller.rb",
       "config/dde_connection.yml.example",
       "lib/dde.rb"
@@ -185,7 +186,7 @@ end
 
 def modify_routes(root)
   
-  if !File.exists?("#{root}/config/routes.backup.rb") and File.exists?("config/routes.rb")
+  if !File.exists?("#{root}/config/routes.backup.rb") and File.exists?("config/routes.rb.additions")
   
     puts "Renaming original routes file ..."
     
