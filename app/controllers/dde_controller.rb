@@ -729,7 +729,7 @@ class DdeController < ApplicationController
   
     results = []
       
-    people = PersonName.find(:all, :conditions => ["CONCAT(given_name, ' ', family_name) LIKE ?", "#{params["search"].strip}%"]) rescue []
+    people = PersonName.find(:all, :conditions => ["CONCAT(given_name, ' ', family_name) LIKE ?", "#{params["search"].strip}%"], :limit => 10) rescue []
     
     people.each do |person|
     
@@ -807,7 +807,7 @@ class DdeController < ApplicationController
       
     results = []
       
-    identifiers = PatientIdentifier.find(:all, :conditions => ["identifier = ?", params["search"]]) rescue []
+    identifiers = PatientIdentifier.find(:all, :conditions => ["identifier = ?", params["search"]], :limit => 10) rescue []
     
     identifiers.each do |identifier|
     
