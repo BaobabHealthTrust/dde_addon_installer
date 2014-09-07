@@ -13,7 +13,7 @@ module DDE
 
       passed = {
          "person"=>{"occupation"=>(person["person_attributes"]["occupation"] rescue nil),
-         "age_estimate"=> (person["birthdate_estimated"] rescue nil),
+         "age_estimate"=> ((person["birthdate_estimated"] rescue false).to_s.downcase == "true" ? 1 : 0),
          "cell_phone_number"=>(person["person_attributes"]["cell_phone_number"] rescue nil),
          "birth_month"=> birthdate_month ,
          "addresses"=>{"address1"=>(person["addresses"]["current_residence"] rescue nil),
@@ -264,15 +264,16 @@ module DDE
         person_params["gender"] = 'M'
 		  end
 
-		  person = Person.create(person_params)
+		  person = Person.create(person_params)     
 
 		  unless birthday_params.empty?
 		    if birthday_params["birth_year"] == "Unknown"
           self.set_birthdate_by_age(person, birthday_params["age_estimate"], person.session_datetime || Date.today)
 		    else
-          self.set_birthdate(person, birthday_params["birth_year"], birthday_params["birth_month"], birthday_params["birth_day"])
+          self.set_birthdate(person, birthday_params["birth_year"], birthday_params["birth_month"], birthday_params["birth_day"], birthday_params["age_estimate"])
 		    end
 		  end
+		  
 		  person.save
 
 		  person.names.create(names_params)
@@ -317,7 +318,7 @@ module DDE
       person.birthdate_estimated = 1
     end
 
-    def self.set_birthdate(person, year = nil, month = nil, day = nil)
+    def self.set_birthdate(person, year = nil, month = nil, day = nil, birthdate_estimated = 0)
       raise "No year passed for estimated birthdate" if year.nil?
 
       # Handle months by name or number (split this out to a date method)
@@ -333,7 +334,7 @@ module DDE
         person.birthdate_estimated = 1
       else
         person.birthdate = Date.new(year.to_i,month_i,day.to_i)
-        person.birthdate_estimated = 0
+        person.birthdate_estimated = birthdate_estimated
       end
     end
 

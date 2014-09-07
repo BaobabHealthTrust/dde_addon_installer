@@ -33,8 +33,6 @@ class DdeController < ApplicationController
 
   def process_result
   
-    # raise params.inspect
-  
     json = JSON.parse(params["person"]) rescue {}
     
     if (json["patient"]["identifiers"].class.to_s.downcase == "hash" rescue false)
@@ -51,7 +49,7 @@ class DdeController < ApplicationController
     
     end 
     
-    patient_id = DDE.search_and_or_create(json.to_json) # rescue nil 
+    patient_id = DDE.search_and_or_create(json.to_json) rescue nil 
     
     json = JSON.parse(params["person"]) rescue {}
     
@@ -765,15 +763,15 @@ class DdeController < ApplicationController
       
       record["Current Village"] = person.addresses.first.city_village rescue nil
       
-      record["Current T/A"] = person.addresses.first.county_district rescue nil
+      record["Current T/A"] = identifier.patient.person.addresses.first.township_division rescue nil
       
-      record["Current District"] = person.addresses.first.state_province rescue nil
+      record["Current District"] = identifier.patient.person.addresses.first.state_province rescue nil
       
-      record["Home Village"] = person.addresses.first.neighborhood_cell rescue nil
+      record["Home Village"] = identifier.patient.person.addresses.first.neighborhood_cell rescue nil
       
-      record["Home T/A"] = person.addresses.first.township_division rescue nil
+      record["Home T/A"] = identifier.patient.person.addresses.first.county_district rescue nil
       
-      record["Home District"] = person.addresses.first.address2 rescue nil
+      record["Home District"] = identifier.patient.person.addresses.first.address2 rescue nil
       
       record["Gender"] = person.person.gender rescue nil
       
@@ -832,7 +830,7 @@ class DdeController < ApplicationController
         end
       
       end rescue nil
-    
+      
       record["names"] = {} if record["names"].nil?
     
       record["names"]["Given Name"] = person.given_name rescue nil
@@ -845,13 +843,13 @@ class DdeController < ApplicationController
       
       record["Current Village"] = identifier.patient.person.addresses.first.city_village rescue nil
       
-      record["Current T/A"] = identifier.patient.person.addresses.first.county_district rescue nil
+      record["Current T/A"] = identifier.patient.person.addresses.first.township_division rescue nil
       
       record["Current District"] = identifier.patient.person.addresses.first.state_province rescue nil
       
       record["Home Village"] = identifier.patient.person.addresses.first.neighborhood_cell rescue nil
       
-      record["Home T/A"] = identifier.patient.person.addresses.first.township_division rescue nil
+      record["Home T/A"] = identifier.patient.person.addresses.first.county_district rescue nil
       
       record["Home District"] = identifier.patient.person.addresses.first.address2 rescue nil
       
@@ -880,6 +878,22 @@ class DdeController < ApplicationController
     end  
       
     render :text => results.uniq.to_json
+  
+  end
+  
+  def push_merge
+  
+    data = JSON.parse(params["data"]) rescue {}
+    
+    result = RestClient.post("http://#{(@settings["dde_username"])}:#{(@settings["dde_password"])}@#{(@settings["dde_server"])}/merge_duplicates", {"data" => data}) rescue nil
+    
+    raise result.inspect
+  
+  end
+  
+  def display_summary
+  
+    
   
   end
   

@@ -317,7 +317,7 @@
 					"Gender", 
 					"Birthdate",
 					"Birthdate Estimated",
-					"Current Residence", 
+					"Current Village", 
 					"Current T/A", 
 					"Current District", 
 					"Home Village", 
@@ -547,7 +547,15 @@
 					
 				}
 				
-				console.log(result);
+				var form = document.createElement("form");
+				form.setAttribute("action", "/push_merge");
+				form.setAttribute("method", "post");
+				
+				form.innerHTML = "<textarea name='data'>" + JSON.stringify(result) + "</textarea>";
+				
+				document.body.appendChild(form);
+				
+				form.submit();
 				
 			}
 		
