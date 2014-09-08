@@ -791,7 +791,7 @@ class DdeController < ApplicationController
            
           record[attribute.type.name] = attribute.value if attributes.include?(attribute.type.name)
       
-      end
+      end rescue nil
     
       results << record
       
@@ -871,7 +871,7 @@ class DdeController < ApplicationController
            
           record[attribute.type.name] = attribute.value if attributes.include?(attribute.type.name)
       
-      end
+      end rescue nil
     
       results << record
       
@@ -885,16 +885,152 @@ class DdeController < ApplicationController
   
     data = JSON.parse(params["data"]) rescue {}
     
-    result = RestClient.post("http://#{(@settings["dde_username"])}:#{(@settings["dde_password"])}@#{(@settings["dde_server"])}/merge_duplicates", {"data" => data}) rescue nil
+    data["Identifiers"] = JSON.parse(data["Identifiers"]) if data["Identifiers"].class.to_s.downcase == "string"
     
-    raise result.inspect
+    @settings = YAML.load_file("#{Rails.root}/config/dde_connection.yml")[Rails.env] # rescue {}
+    
+    result = RestClient.post("http://#{(@settings["dde_username"])}:#{(@settings["dde_password"])}@#{(@settings["dde_server"])}/merge_duplicates", {"data" => data.to_json}, {:content_type => :json}) # rescue nil
+    
+    # raise result.inspect  
   
+    if !result["success"].nil?
+    
+      merged = data["Identifiers"]["Merged"] rescue {}
+      
+      identifier = PatientIdentifier.find_by_identifier(merged["National ID"]) rescue nil
+      
+      identifier.patient.person.update_attributes("voided" => 1, "void_reason" => "Merged record") rescue nil
+      
+      identifier.update_attributes("voided" => 1, "void_reason" => "Merged record") rescue nil
+    
+      target = PatientIdentifier.find_by_identifier(data["Identifiers"]["National ID"]) rescue nil
+      
+      person_id = target.patient.person.person_id rescue nil
+      
+      PatientIdentifier.create("patient_id" => person_id, 
+                               "identifier" => merged["National ID"], 
+                               "identifier_type" => PatientIdentifierType.find_by_name("Old Identification Number").id) rescue nil
+    
+      merged["Identifiers"].each do |id|
+      
+        PatientIdentifier.create("patient_id" => person_id, 
+                               "identifier" => id[id.keys[0]], 
+                               "identifier_type" => PatientIdentifierType.find_by_name(id.keys[0]).id) rescue nil
+      
+      end 
+    
+      fields = [
+            "Given Name", 
+					  "Middle Name",
+					  "Family Name", 
+					  "Gender", 
+					  "Birthdate",
+					  "Birthdate Estimated",
+					  "Current Village", 
+					  "Current T/A", 
+					  "Current District", 
+					  "Home Village", 
+					  "Home T/A", 
+					  "Home District", 
+					  "Occupation", 
+					  "Home Phone Number", 
+					  "Cell Phone Number", 
+					  "Office Phone Number",
+					  "Citizenship", 
+					  "Race"
+				  ]
+      
+      person = Person.find(person_id) rescue nil
+      
+      if !person.nil?
+           
+        name = PersonName.find_by_person_id(person_id) rescue nil   
+
+        name = PersonName.new if name.nil?
+        
+        addresses = PersonAddress.find_by_person_id(person_id) rescue nil 
+        
+        addresses = PersonAddress.new if addresses.nil?
+        
+        fields.each do |field|
+        
+          case field
+            when "Given Name"
+                name.given_name = data[field]
+              
+            when "Middle Name"
+                name.middle_name = data[field]
+              
+            when "Family Name"
+                name.family_name = data[field]
+                
+            when "Gender"
+                person.gender = data[field][0,1] rescue nil
+            
+            when "Birthdate"
+                person.birthdate = data[field]
+            
+            when "Birthdate Estimated"
+                person.birthdate_estimated = data[field]
+            
+            when "Current Village"
+                addresses.city_village = data[field]
+            
+            when "Current T/A"
+                addresses.township_division = data[field]
+            
+            when "Current District"
+                addresses.state_province = data[field]
+            
+            when "Home Village"
+                addresses.neighborhood_cell = data[field]
+            
+            when "Home T/A"
+                addresses.county_district = data[field]
+            
+            when "Home District"
+                addresses.address2 = data[field]
+            
+            else 
+                
+                if ["Occupation", "Home Phone Number", "Cell Phone Number", "Office Phone Number", "Citizenship", "Race"].include?(field)
+                
+                    attribute = PersonAttribute.find_by_person_id(person_id, :conditions => ["person_attribute_type_id = ?", PersonAttributeType.find_by_name(field).id]) rescue nil
+
+                    attribute = PersonAttribute.new if attribute.nil?
+                    
+                    attribute.value = data[field]
+                    
+                    attribute.person_id = person_id
+                    
+                    attribute.save if !data[field].blank?
+                    
+                end
+          end
+        end
+        
+        person.save
+        
+        name.save
+        
+        addresses.save
+        
+      end
+    
+      flash["notice"] = "Merge successful!"
+      
+    else
+    
+      flash["error"] = result["error"]
+      
+    end
+    
+      redirect_to "/dde/duplicates" and return
+    
   end
   
   def display_summary
-  
-    
-  
+      
   end
   
 end
