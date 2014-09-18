@@ -460,7 +460,7 @@
     if(__$("matched")){
       __$("matched").innerHTML = "";
       
-      var obj = JSON.parse(people[pos]);        
+      var obj = JSON.parse(people[parseInt(pos)]);         
       
       if(__$("btnSelect")){
         __$("btnSelect").className = "button_green";
@@ -479,7 +479,7 @@
              
       if(__$("btnUpdate")){
       
-        var obj = JSON.parse(people[parseInt(this.getAttribute("pos"))]);      
+        var obj = JSON.parse(people[pos]);      
           
         if(obj["_id"] != null){
             
