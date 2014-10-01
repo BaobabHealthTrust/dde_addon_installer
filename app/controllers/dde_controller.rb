@@ -70,6 +70,8 @@ class DdeController < ApplicationController
   def process_data
     @settings = YAML.load_file("#{Rails.root}/config/dde_connection.yml")[Rails.env] rescue {}
 
+    params[:id] = params[:id].strip.gsub(/\s/, "").gsub(/\-/, "") rescue params[:id]
+
     patient = PatientIdentifier.find_by_identifier(params[:id]).patient rescue nil
 
     national_id = ((patient.patient_identifiers.find_by_identifier_type(PatientIdentifierType.find_by_name("National id").id).identifier rescue nil) || params[:id])
