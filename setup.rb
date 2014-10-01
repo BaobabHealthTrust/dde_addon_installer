@@ -62,7 +62,9 @@ def install(root)
       "app/views/dde/duplicates.html.erb",
       "app/controllers/dde_controller.rb",
       "config/dde_connection.yml.example",
-      "lib/dde.rb"
+      "lib/dde.rb",
+      "public/images/female.png",
+      "public/images/male.png"
     ]  
     # "app/views/dde/index.html.erb",
       
@@ -352,7 +354,9 @@ def uninstall(root)
       "app/views/dde/duplicates.html.erb",
       "app/controllers/dde_controller.rb",
       "config/dde_connection.yml.example",
-      "lib/dde.rb"
+      "lib/dde.rb",
+      "public/images/female.png",
+      "public/images/male.png"
     ]
   
   if File.exists?("#{root}/app/views/dde")
