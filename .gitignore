@@ -11,7 +11,6 @@ config/routes.rb
 db/
 doc/
 log/
-public/
 script/
 test/
 *~
