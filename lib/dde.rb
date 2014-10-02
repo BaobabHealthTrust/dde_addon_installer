@@ -42,7 +42,8 @@ module DDE
             "names" => {
                 "family_name" => (person["names"]["family_name"] rescue nil),
                 "given_name" => (person["names"]["given_name"] rescue nil),
-                "middle_name" => ""
+                "middle_name" => (person["names"]["middle_name"] rescue nil),
+                "family_name2" => (person["names"]["maiden_name"] rescue nil)
             },
             "birth_year" => birthdate_year
         },
@@ -98,7 +99,7 @@ module DDE
 
       local = {
           "gender" => (patient.person.gender rescue nil),
-          "birthdate_estimated" => (patient.person.birthdate_estimated rescue nil),
+          "birthdate_estimated" => ((patient.person.birthdate_estimated rescue 0) == 1 ? true : false),
           "patient_id" => (patient.patient_id rescue nil),
           "national_id" => (patient.patient_identifiers.find_by_identifier_type(PatientIdentifierType.find_by_name("National id").id).identifier rescue nil),
           "addresses" => {
@@ -117,6 +118,7 @@ module DDE
               "home_phone_number" => (patient.person.person_attributes.find_by_person_attribute_type_id(PersonAttributeType.find_by_name("Home Phone Number").id).value rescue nil),
               "office_phone_number" => (patient.person.person_attributes.find_by_person_attribute_type_id(PersonAttributeType.find_by_name("Office Phone Number").id).value rescue nil),
               "race" => (patient.person.person_attributes.find_by_person_attribute_type_id(PersonAttributeType.find_by_name("Race").id).value rescue nil),
+              "country_of_residence" => (patient.person.person_attributes.find_by_person_attribute_type_id(PersonAttributeType.find_by_name("Current Place Of Residence").id).value rescue nil),
               "citizenship" => (patient.person.person_attributes.find_by_person_attribute_type_id(PersonAttributeType.find_by_name("Citizenship").id).value rescue nil)
           },
           "patient" => {
@@ -125,7 +127,9 @@ module DDE
           "birthdate" => (patient.person.birthdate.strftime("%Y-%m-%d") rescue nil),
           "names" => {
               "given_name" => (patient.person.names.first.given_name rescue nil),
-              "family_name" => (patient.person.names.first.family_name rescue nil)
+              "family_name" => (patient.person.names.first.family_name rescue nil),
+              "middle_name" => (patient.person.names.first.middle_name rescue nil),
+              "maiden_name" => (patient.person.names.first.family_name2 rescue nil)
           }
       }
 
@@ -136,17 +140,21 @@ module DDE
         patient.person.update_attributes(
             "gender" => person["gender"],
             "birthdate" => person["birthdate"],
-            "birthdate_estimated" => person["birthdate_estimated"]
+            "birthdate_estimated" => (person["birthdate_estimated"] ? 1 : 0)
         )
 
       end
 
-      if (local["names"]["given_name"].downcase.strip != person["names"]["given_name"].downcase.strip) or
-          (local["names"]["family_name"].downcase.strip != person["names"]["family_name"].downcase.strip)
+      if ((local["names"]["given_name"].downcase.strip rescue "") != (person["names"]["given_name"].downcase.strip rescue "")) or
+          ((local["names"]["family_name"].downcase.strip rescue "") != (person["names"]["family_name"].downcase.strip rescue "")) or
+          ((local["names"]["maiden_name"].downcase.strip rescue "") != (person["names"]["maiden_name"].downcase.strip rescue "")) or
+          ((local["names"]["middle_name"].downcase.strip rescue "") != (person["names"]["middle_name"].downcase.strip rescue ""))
 
         patient.person.names.first.update_attributes(
             "given_name" => person["names"]["given_name"],
-            "family_name" => person["names"]["family_name"]
+            "family_name" => person["names"]["family_name"],
+            "middle_name" => person["names"]["middle_name"],
+            "family_name2" => person["names"]["maiden_name"]
         )
 
       end
@@ -180,6 +188,7 @@ module DDE
           {"occupation" => "Occupation"},
           {"cell_phone_number" => "Cell Phone Number"},
           {"home_phone_number" => "Home Phone Number"},
+          {"office_phone_number" => "Office Phone Number"},
           {"race" => "Race"},
           {"citizenship" => "Citizenship"},
           {"office_phone_number" => "Office Phone Number"},
@@ -189,11 +198,13 @@ module DDE
       fields.each do |field|
 
         if (local["person_attributes"][field.keys[0]] rescue nil).to_s.strip.downcase != (person["person_attributes"][field.keys[0]] rescue nil).to_s.strip.downcase
-          pattribute = PersonAttribute.find_by_person_attribute_type_id(PersonAttributeType.find_by_name(field[field.keys[0]]).id) rescue nil
+          pattribute = PersonAttribute.find_by_person_attribute_type_id(PersonAttributeType.find_by_name(field[field.keys[0]]).id, :conditions => ["person_id = ?", patient.person.person_id]) rescue nil
 
           if !pattribute.blank?
 
             pattribute.update_attributes("value" => (person["person_attributes"][field.keys[0]] rescue nil))
+
+            pattribute.save!
 
           else
 

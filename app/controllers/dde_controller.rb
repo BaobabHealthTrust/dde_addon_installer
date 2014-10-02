@@ -49,7 +49,9 @@ class DdeController < ApplicationController
 
     end
 
-    patient_id = DDE.search_and_or_create(json.to_json) rescue nil
+    patient_id = DDE.search_and_or_create(json.to_json) # rescue nil
+
+    # raise patient_id.inspect
 
     json = JSON.parse(params["person"]) rescue {}
 
@@ -89,21 +91,25 @@ class DdeController < ApplicationController
         "names" =>
             {
                 "family_name" => (name.family_name rescue nil),
-                "given_name" => (name.given_name rescue nil)
+                "given_name" => (name.given_name rescue nil),
+                "middle_name" => (name.middle_name rescue nil),
+                "maiden_name" => (name.family_name2 rescue nil)
             },
         "gender" => (patient.person.gender rescue nil),
         "person_attributes" => {
             "occupation" => (patient.person.person_attributes.find_by_person_attribute_type_id(PersonAttributeType.find_by_name("Occupation").id).value rescue nil),
             "cell_phone_number" => (patient.person.person_attributes.find_by_person_attribute_type_id(PersonAttributeType.find_by_name("Cell Phone Number").id).value rescue nil),
             "home_phone_number" => (patient.person.person_attributes.find_by_person_attribute_type_id(PersonAttributeType.find_by_name("Home Phone Number").id).value rescue nil),
+            "office_phone_number" => (patient.person.person_attributes.find_by_person_attribute_type_id(PersonAttributeType.find_by_name("Office Phone Number").id).value rescue nil),
             "race" => (patient.person.person_attributes.find_by_person_attribute_type_id(PersonAttributeType.find_by_name("Race").id).value rescue nil),
+            "country_of_residence" => (patient.person.person_attributes.find_by_person_attribute_type_id(PersonAttributeType.find_by_name("Current Place Of Residence").id).value rescue nil),
             "citizenship" => (patient.person.person_attributes.find_by_person_attribute_type_id(PersonAttributeType.find_by_name("Citizenship").id).value rescue nil)
         },
         "birthdate" => (patient.person.birthdate rescue nil),
         "patient" => {
             "identifiers" => (patient.patient_identifiers.collect { |id| {id.type.name => id.identifier} if id.type.name.downcase != "national id" }.delete_if { |x| x.nil? } rescue [])
         },
-        "birthdate_estimated" => nil,
+        "birthdate_estimated" => ((patient.person.birthdate_estimated rescue 0) == 1 ? true : false),
         "addresses" => {
             "current_residence" => (address.address1 rescue nil),
             "current_village" => (address.city_village rescue nil),
@@ -178,49 +184,49 @@ class DdeController < ApplicationController
 
   def new_patient
 
-    params = YAML.load_file("#{Rails.root}/config/globals.yml")[Rails.env] rescue {}
+    settings = YAML.load_file("#{Rails.root}/config/globals.yml")[Rails.env] rescue {}
 
     @settings = YAML.load_file("#{Rails.root}/config/dde_connection.yml")[Rails.env] rescue {}
 
-    @show_middle_name = (params["show_middle_name"] == true ? true : false) rescue false
+    @show_middle_name = (settings["show_middle_name"] == true ? true : false) rescue false
 
-    @show_maiden_name = (params["show_maiden_name"] == true ? true : false) rescue false
+    @show_maiden_name = (settings["show_maiden_name"] == true ? true : false) rescue false
 
-    @show_birthyear = (params["show_birthyear"] == true ? true : false) rescue false
+    @show_birthyear = (settings["show_birthyear"] == true ? true : false) rescue false
 
-    @show_birthmonth = (params["show_birthmonth"] == true ? true : false) rescue false
+    @show_birthmonth = (settings["show_birthmonth"] == true ? true : false) rescue false
 
-    @show_birthdate = (params["show_birthdate"] == true ? true : false) rescue false
+    @show_birthdate = (settings["show_birthdate"] == true ? true : false) rescue false
 
-    @show_age = (params["show_age"] == true ? true : false) rescue false
+    @show_age = (settings["show_age"] == true ? true : false) rescue false
 
-    @show_region_of_origin = (params["show_region_of_origin"] == true ? true : false) rescue false
+    @show_region_of_origin = (settings["show_region_of_origin"] == true ? true : false) rescue false
 
-    @show_district_of_origin = (params["show_district_of_origin"] == true ? true : false) rescue false
+    @show_district_of_origin = (settings["show_district_of_origin"] == true ? true : false) rescue false
 
-    @show_t_a_of_origin = (params["show_t_a_of_origin"] == true ? true : false) rescue false
+    @show_t_a_of_origin = (settings["show_t_a_of_origin"] == true ? true : false) rescue false
 
-    @show_home_village = (params["show_home_village"] == true ? true : false) rescue false
+    @show_home_village = (settings["show_home_village"] == true ? true : false) rescue false
 
-    @show_current_region = (params["show_current_region"] == true ? true : false) rescue false
+    @show_current_region = (settings["show_current_region"] == true ? true : false) rescue false
 
-    @show_current_district = (params["show_current_district"] == true ? true : false) rescue false
+    @show_current_district = (settings["show_current_district"] == true ? true : false) rescue false
 
-    @show_current_t_a = (params["show_current_t_a"] == true ? true : false) rescue false
+    @show_current_t_a = (settings["show_current_t_a"] == true ? true : false) rescue false
 
-    @show_current_village = (params["show_current_village"] == true ? true : false) rescue false
+    @show_current_village = (settings["show_current_village"] == true ? true : false) rescue false
 
-    @show_current_landmark = (params["show_current_landmark"] == true ? true : false) rescue false
+    @show_current_landmark = (settings["show_current_landmark"] == true ? true : false) rescue false
 
-    @show_cell_phone_number = (params["show_cell_phone_number"] == true ? true : false) rescue false
+    @show_cell_phone_number = (settings["show_cell_phone_number"] == true ? true : false) rescue false
 
-    @show_office_phone_number = (params["show_office_phone_number"] == true ? true : false) rescue false
+    @show_office_phone_number = (settings["show_office_phone_number"] == true ? true : false) rescue false
 
-    @show_home_phone_number = (params["show_home_phone_number"] == true ? true : false) rescue false
+    @show_home_phone_number = (settings["show_home_phone_number"] == true ? true : false) rescue false
 
-    @show_occupation = (params["show_occupation"] == true ? true : false) rescue false
+    @show_occupation = (settings["show_occupation"] == true ? true : false) rescue false
 
-    @show_nationality = (params["show_nationality"] == true ? true : false) rescue false
+    @show_nationality = (settings["show_nationality"] == true ? true : false) rescue false
 
     @occupations = ['','Driver','Housewife','Messenger','Business','Farmer','Salesperson','Teacher',
                     'Student','Security guard','Domestic worker', 'Police','Office worker',
@@ -237,7 +243,57 @@ class DdeController < ApplicationController
       person_id = params[:id]
     end
 
+    settings = YAML.load_file("#{Rails.root}/config/globals.yml")[Rails.env] rescue {}
+
+    @settings = YAML.load_file("#{Rails.root}/config/dde_connection.yml")[Rails.env] rescue {}
+
+    @show_middle_name = (settings["show_middle_name"] == true ? true : false) rescue false
+
+    @show_maiden_name = (settings["show_maiden_name"] == true ? true : false) rescue false
+
+    @show_birthyear = (settings["show_birthyear"] == true ? true : false) rescue false
+
+    @show_birthmonth = (settings["show_birthmonth"] == true ? true : false) rescue false
+
+    @show_birthdate = (settings["show_birthdate"] == true ? true : false) rescue false
+
+    @show_age = (settings["show_age"] == true ? true : false) rescue false
+
+    @show_region_of_origin = (settings["show_region_of_origin"] == true ? true : false) rescue false
+
+    @show_district_of_origin = (settings["show_district_of_origin"] == true ? true : false) rescue false
+
+    @show_t_a_of_origin = (settings["show_t_a_of_origin"] == true ? true : false) rescue false
+
+    @show_home_village = (settings["show_home_village"] == true ? true : false) rescue false
+
+    @show_current_region = (settings["show_current_region"] == true ? true : false) rescue false
+
+    @show_current_district = (settings["show_current_district"] == true ? true : false) rescue false
+
+    @show_current_t_a = (settings["show_current_t_a"] == true ? true : false) rescue false
+
+    @show_current_village = (settings["show_current_village"] == true ? true : false) rescue false
+
+    @show_current_landmark = (settings["show_current_landmark"] == true ? true : false) rescue false
+
+    @show_cell_phone_number = (settings["show_cell_phone_number"] == true ? true : false) rescue false
+
+    @show_office_phone_number = (settings["show_office_phone_number"] == true ? true : false) rescue false
+
+    @show_home_phone_number = (settings["show_home_phone_number"] == true ? true : false) rescue false
+
+    @show_occupation = (settings["show_occupation"] == true ? true : false) rescue false
+
+    @show_nationality = (settings["show_nationality"] == true ? true : false) rescue false
+
+    @occupations = ['','Driver','Housewife','Messenger','Business','Farmer','Salesperson','Teacher',
+                    'Student','Security guard','Domestic worker', 'Police','Office worker',
+                    'Preschool child','Mechanic','Prisoner','Craftsman','Healthcare Worker','Soldier'].sort.concat(["Other","Unknown"])
+
     @person = Person.find(person_id)
+
+    render :template => false
   end
 
   def edit_demographics
@@ -314,15 +370,32 @@ class DdeController < ApplicationController
         "names" =>
             {
                 "family_name" => (!(params[:person][:names][:family_name] rescue nil).blank? ? (params[:person][:names][:family_name] rescue nil) : (name.family_name rescue nil)),
-                "given_name" => (!(params[:person][:names][:given_name] rescue nil).blank? ? (params[:person][:names][:given_name] rescue nil) : (name.given_name rescue nil))
+                "given_name" => (!(params[:person][:names][:given_name] rescue nil).blank? ? (params[:person][:names][:given_name] rescue nil) : (name.given_name rescue nil)),
+                "middle_name" => (!(params[:person][:names][:middle_name] rescue nil).blank? ? (params[:person][:names][:middle_name] rescue nil) : (name.middle_name rescue nil)),
+                "maiden_name" => (!(params[:person][:names][:family_name2] rescue nil).blank? ? (params[:person][:names][:family_name2] rescue nil) : (name.family_name2 rescue nil))
             },
         "gender" => (!params["gender"].blank? ? params["gender"] : (patient.person.gender rescue nil)),
         "person_attributes" => {
-            "occupation" => (patient.person.person_attributes.find_by_person_attribute_type_id(PersonAttributeType.find_by_name("Occupation").id).value rescue nil),
-            "cell_phone_number" => (patient.person.person_attributes.find_by_person_attribute_type_id(PersonAttributeType.find_by_name("Cell Phone Number").id).value rescue nil),
-            "home_phone_number" => (patient.person.person_attributes.find_by_person_attribute_type_id(PersonAttributeType.find_by_name("Home Phone Number").id).value rescue nil),
-            "race" => (patient.person.person_attributes.find_by_person_attribute_type_id(PersonAttributeType.find_by_name("Race").id).value rescue nil),
-            "citizenship" => (patient.person.person_attributes.find_by_person_attribute_type_id(PersonAttributeType.find_by_name("Citizenship").id).value rescue nil)
+            "occupation" => (!(params[:person][:attributes][:occupation] rescue nil).blank? ? (params[:person][:attributes][:occupation] rescue nil) :
+                (patient.person.person_attributes.find_by_person_attribute_type_id(PersonAttributeType.find_by_name("Occupation").id).value rescue nil)),
+
+            "cell_phone_number" => (!(params[:person][:attributes][:cell_phone_number] rescue nil).blank? ? (params[:person][:attributes][:cell_phone_number] rescue nil) :
+                (patient.person.person_attributes.find_by_person_attribute_type_id(PersonAttributeType.find_by_name("Cell Phone Number").id).value rescue nil)),
+
+            "home_phone_number" => (!(params[:person][:attributes][:home_phone_number] rescue nil).blank? ? (params[:person][:attributes][:home_phone_number] rescue nil) :
+                (patient.person.person_attributes.find_by_person_attribute_type_id(PersonAttributeType.find_by_name("Home Phone Number").id).value rescue nil)),
+
+            "office_phone_number" => (!(params[:person][:attributes][:office_phone_number] rescue nil).blank? ? (params[:person][:attributes][:office_phone_number] rescue nil) :
+                    (patient.person.person_attributes.find_by_person_attribute_type_id(PersonAttributeType.find_by_name("Office Phone Number").id).value rescue nil)),
+
+            "race" => (!(params[:person][:attributes][:race] rescue nil).blank? ? (params[:person][:attributes][:race] rescue nil) :
+                        (patient.person.person_attributes.find_by_person_attribute_type_id(PersonAttributeType.find_by_name("Race").id).value rescue nil)),
+
+            "country_of_residence" => (!(params[:person][:attributes][:country_of_residence] rescue nil).blank? ? (params[:person][:attributes][:country_of_residence] rescue nil) :
+                            (patient.person.person_attributes.find_by_person_attribute_type_id(PersonAttributeType.find_by_name("Current Place Of Residence").id).value rescue nil)),
+
+            "citizenship" => (!(params[:person][:attributes][:citizenship] rescue nil).blank? ? (params[:person][:attributes][:citizenship] rescue nil) :
+                                (patient.person.person_attributes.find_by_person_attribute_type_id(PersonAttributeType.find_by_name("Citizenship").id).value rescue nil))
         },
         "birthdate" => dob,
         "patient" => {
@@ -441,21 +514,25 @@ class DdeController < ApplicationController
               "names" =>
                   {
                       "family_name" => (name.family_name rescue nil),
-                      "given_name" => (name.given_name rescue nil)
+                      "given_name" => (name.given_name rescue nil),
+                      "middle_name" => (name.middle_name rescue nil),
+                      "maiden_name" => (name.family_name2 rescue nil)
                   },
               "gender" => (patient.person.gender rescue nil),
               "person_attributes" => {
                   "occupation" => (patient.person.person_attributes.find_by_person_attribute_type_id(PersonAttributeType.find_by_name("Occupation").id).value rescue nil),
                   "cell_phone_number" => (patient.person.person_attributes.find_by_person_attribute_type_id(PersonAttributeType.find_by_name("Cell Phone Number").id).value rescue nil),
                   "home_phone_number" => (patient.person.person_attributes.find_by_person_attribute_type_id(PersonAttributeType.find_by_name("Home Phone Number").id).value rescue nil),
+                  "office_phone_number" => (patient.person.person_attributes.find_by_person_attribute_type_id(PersonAttributeType.find_by_name("Office Phone Number").id).value rescue nil),
                   "race" => (patient.person.person_attributes.find_by_person_attribute_type_id(PersonAttributeType.find_by_name("Race").id).value rescue nil),
+                  "country_of_residence" => (patient.person.person_attributes.find_by_person_attribute_type_id(PersonAttributeType.find_by_name("Current Place Of Residence").id).value rescue nil),
                   "citizenship" => (patient.person.person_attributes.find_by_person_attribute_type_id(PersonAttributeType.find_by_name("Citizenship").id).value rescue nil)
               },
               "birthdate" => (patient.person.birthdate rescue nil),
               "patient" => {
                   "identifiers" => (patient.patient_identifiers.collect { |id| {id.type.name => id.identifier} if id.type.name.downcase != "national id" }.delete_if { |x| x.nil? } rescue [])
               },
-              "birthdate_estimated" => nil,
+              "birthdate_estimated" => ((patient.person.birthdate_estimated rescue 0) == 1 ? true : false),
               "addresses" => {
                   "current_residence" => (address.address1 rescue nil),
                   "current_village" => (address.city_village rescue nil),
@@ -509,21 +586,25 @@ class DdeController < ApplicationController
             "names" =>
                 {
                     "family_name" => (name.family_name rescue nil),
-                    "given_name" => (name.given_name rescue nil)
+                    "given_name" => (name.given_name rescue nil),
+                    "middle_name" => (name.middle_name rescue nil),
+                    "maiden_name" => (name.family_name2 rescue nil)
                 },
             "gender" => (patient.person.gender rescue nil),
             "person_attributes" => {
                 "occupation" => (patient.person.person_attributes.find_by_person_attribute_type_id(PersonAttributeType.find_by_name("Occupation").id).value rescue nil),
                 "cell_phone_number" => (patient.person.person_attributes.find_by_person_attribute_type_id(PersonAttributeType.find_by_name("Cell Phone Number").id).value rescue nil),
                 "home_phone_number" => (patient.person.person_attributes.find_by_person_attribute_type_id(PersonAttributeType.find_by_name("Home Phone Number").id).value rescue nil),
+                "office_phone_number" => (patient.person.person_attributes.find_by_person_attribute_type_id(PersonAttributeType.find_by_name("Office Phone Number").id).value rescue nil),
                 "race" => (patient.person.person_attributes.find_by_person_attribute_type_id(PersonAttributeType.find_by_name("Race").id).value rescue nil),
+                "country_of_residence" => (patient.person.person_attributes.find_by_person_attribute_type_id(PersonAttributeType.find_by_name("Current Place Of Residence").id).value rescue nil),
                 "citizenship" => (patient.person.person_attributes.find_by_person_attribute_type_id(PersonAttributeType.find_by_name("Citizenship").id).value rescue nil)
             },
             "birthdate" => (patient.person.birthdate rescue nil),
             "patient" => {
                 "identifiers" => (patient.patient_identifiers.collect { |id| {id.type.name => id.identifier} if id.type.name.downcase != "national id" }.delete_if { |x| x.nil? } rescue [])
             },
-            "birthdate_estimated" => nil,
+            "birthdate_estimated" => ((patient.person.birthdate_estimated rescue 0) == 1 ? true : false),
             "addresses" => {
                 "current_residence" => (address.address1 rescue nil),
                 "current_village" => (address.city_village rescue nil),
@@ -579,21 +660,25 @@ class DdeController < ApplicationController
             "names" =>
                 {
                     "family_name" => (name.family_name rescue nil),
-                    "given_name" => (name.given_name rescue nil)
+                    "given_name" => (name.given_name rescue nil),
+                    "middle_name" => (name.middle_name rescue nil),
+                    "maiden_name" => (name.family_name2 rescue nil)
                 },
             "gender" => (patient.person.gender rescue nil),
             "person_attributes" => {
                 "occupation" => (patient.person.person_attributes.find_by_person_attribute_type_id(PersonAttributeType.find_by_name("Occupation").id).value rescue nil),
                 "cell_phone_number" => (patient.person.person_attributes.find_by_person_attribute_type_id(PersonAttributeType.find_by_name("Cell Phone Number").id).value rescue nil),
                 "home_phone_number" => (patient.person.person_attributes.find_by_person_attribute_type_id(PersonAttributeType.find_by_name("Home Phone Number").id).value rescue nil),
+                "office_phone_number" => (patient.person.person_attributes.find_by_person_attribute_type_id(PersonAttributeType.find_by_name("Office Phone Number").id).value rescue nil),
                 "race" => (patient.person.person_attributes.find_by_person_attribute_type_id(PersonAttributeType.find_by_name("Race").id).value rescue nil),
+                "country_of_residence" => (patient.person.person_attributes.find_by_person_attribute_type_id(PersonAttributeType.find_by_name("Current Place Of Residence").id).value rescue nil),
                 "citizenship" => (patient.person.person_attributes.find_by_person_attribute_type_id(PersonAttributeType.find_by_name("Citizenship").id).value rescue nil)
             },
             "birthdate" => (patient.person.birthdate rescue nil),
             "patient" => {
                 "identifiers" => (patient.patient_identifiers.collect { |id| {id.type.name => id.identifier} if id.type.name.downcase != "national id" }.delete_if { |x| x.nil? } rescue [])
             },
-            "birthdate_estimated" => nil,
+            "birthdate_estimated" => ((patient.person.birthdate_estimated rescue 0) == 1 ? true : false),
             "addresses" => {
                 "current_residence" => (address.address1 rescue nil),
                 "current_village" => (address.city_village rescue nil),
@@ -723,21 +808,25 @@ class DdeController < ApplicationController
           "names" =>
               {
                   "family_name" => (name.family_name rescue nil),
-                  "given_name" => (name.given_name rescue nil)
+                  "given_name" => (name.given_name rescue nil),
+                  "middle_name" => (name.middle_name rescue nil),
+                  "maiden_name" => (name.family_name2 rescue nil)
               },
           "gender" => (patient.person.gender rescue nil),
           "person_attributes" => {
               "occupation" => (patient.person.person_attributes.find_by_person_attribute_type_id(PersonAttributeType.find_by_name("Occupation").id).value rescue nil),
               "cell_phone_number" => (patient.person.person_attributes.find_by_person_attribute_type_id(PersonAttributeType.find_by_name("Cell Phone Number").id).value rescue nil),
               "home_phone_number" => (patient.person.person_attributes.find_by_person_attribute_type_id(PersonAttributeType.find_by_name("Home Phone Number").id).value rescue nil),
+              "office_phone_number" => (patient.person.person_attributes.find_by_person_attribute_type_id(PersonAttributeType.find_by_name("Office Phone Number").id).value rescue nil),
               "race" => (patient.person.person_attributes.find_by_person_attribute_type_id(PersonAttributeType.find_by_name("Race").id).value rescue nil),
+              "country_of_residence" => (patient.person.person_attributes.find_by_person_attribute_type_id(PersonAttributeType.find_by_name("Current Place Of Residence").id).value rescue nil),
               "citizenship" => (patient.person.person_attributes.find_by_person_attribute_type_id(PersonAttributeType.find_by_name("Citizenship").id).value rescue nil)
           },
           "birthdate" => (patient.person.birthdate rescue nil),
           "patient" => {
               "identifiers" => (patient.patient_identifiers.collect { |id| {id.type.name => id.identifier} if id.type.name.downcase != "national id" }.delete_if { |x| x.nil? } rescue [])
           },
-          "birthdate_estimated" => nil,
+          "birthdate_estimated" => ((patient.person.birthdate_estimated rescue 0) == 1 ? true : false),
           "addresses" => {
               "current_residence" => (address.address1 rescue nil),
               "current_village" => (address.city_village rescue nil),
