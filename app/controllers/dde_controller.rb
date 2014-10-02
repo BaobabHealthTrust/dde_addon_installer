@@ -178,7 +178,55 @@ class DdeController < ApplicationController
 
   def new_patient
 
+    params = YAML.load_file("#{Rails.root}/config/globals.yml")[Rails.env] rescue {}
+
     @settings = YAML.load_file("#{Rails.root}/config/dde_connection.yml")[Rails.env] rescue {}
+
+    @show_middle_name = (params["show_middle_name"] == true ? true : false) rescue false
+
+    @show_maiden_name = (params["show_maiden_name"] == true ? true : false) rescue false
+
+    @show_birthyear = (params["show_birthyear"] == true ? true : false) rescue false
+
+    @show_birthmonth = (params["show_birthmonth"] == true ? true : false) rescue false
+
+    @show_birthdate = (params["show_birthdate"] == true ? true : false) rescue false
+
+    @show_age = (params["show_age"] == true ? true : false) rescue false
+
+    @show_region_of_origin = (params["show_region_of_origin"] == true ? true : false) rescue false
+
+    @show_district_of_origin = (params["show_district_of_origin"] == true ? true : false) rescue false
+
+    @show_t_a_of_origin = (params["show_t_a_of_origin"] == true ? true : false) rescue false
+
+    @show_home_village = (params["show_home_village"] == true ? true : false) rescue false
+
+    @show_current_region = (params["show_current_region"] == true ? true : false) rescue false
+
+    @show_current_district = (params["show_current_district"] == true ? true : false) rescue false
+
+    @show_current_t_a = (params["show_current_t_a"] == true ? true : false) rescue false
+
+    @show_current_village = (params["show_current_village"] == true ? true : false) rescue false
+
+    @show_current_landmark = (params["show_current_landmark"] == true ? true : false) rescue false
+
+    @show_cell_phone_number = (params["show_cell_phone_number"] == true ? true : false) rescue false
+
+    @show_office_phone_number = (params["show_office_phone_number"] == true ? true : false) rescue false
+
+    @show_home_phone_number = (params["show_home_phone_number"] == true ? true : false) rescue false
+
+    @show_occupation = (params["show_occupation"] == true ? true : false) rescue false
+
+    @show_nationality = (params["show_nationality"] == true ? true : false) rescue false
+
+    @occupations = ['','Driver','Housewife','Messenger','Business','Farmer','Salesperson','Teacher',
+                    'Student','Security guard','Domestic worker', 'Police','Office worker',
+                    'Preschool child','Mechanic','Prisoner','Craftsman','Healthcare Worker','Soldier'].sort.concat(["Other","Unknown"])
+
+    @destination = request.referrer
 
   end
 
@@ -653,7 +701,7 @@ class DdeController < ApplicationController
 
     end
 
-    pagesize = ((pagesize + 2) * 2) - result.length
+    # pagesize = ((pagesize) * 2) - result.length
 
     Person.find(:all, :joins => [:names], :limit => pagesize, :offset => offset, :conditions => ["given_name = ? AND family_name = ? AND gender = ?", params["given_name"], params["family_name"], params["gender"]]).each do |person|
 
@@ -706,7 +754,11 @@ class DdeController < ApplicationController
 
       result << person
 
-    end
+      # TODO: Need to find a way to limit in a better way the number of records returned without skipping any as some will never be seen with the current approach
+
+      break if result.length >= 7
+
+    end if pagesize > 0 and result.length < 8
 
     render :text => result.to_json
   end
@@ -1035,6 +1087,57 @@ class DdeController < ApplicationController
 
   def display_summary
 
+  end
+
+  # Districts containing the string given in params[:value]
+  def district
+    region_id = DDERegion.find_by_name("#{params[:filter_value]}").id
+    region_conditions = ["name LIKE (?) AND region_id = ? ", "#{params[:search_string]}%", region_id]
+
+    districts = DDEDistrict.find(:all,:conditions => region_conditions, :order => 'name')
+    districts = districts.map do |d|
+      "<li value='#{d.name}'>#{d.name}</li>"
+    end
+    render :text => districts.join('') + "<li value='Other'>Other</li>" and return
+  end
+
+  # List traditional authority containing the string given in params[:value]
+  def traditional_authority
+    district_id = DDEDistrict.find_by_name("#{params[:filter_value]}").id
+    traditional_authority_conditions = ["name LIKE (?) AND district_id = ?", "%#{params[:search_string]}%", district_id]
+
+    traditional_authorities = DDETraditionalAuthority.find(:all,:conditions => traditional_authority_conditions, :order => 'name')
+    traditional_authorities = traditional_authorities.map do |t_a|
+      "<li value='#{t_a.name}'>#{t_a.name}</li>"
+    end
+    render :text => traditional_authorities.join('') + "<li value='Other'>Other</li>" and return
+  end
+
+  # Villages containing the string given in params[:value]
+  def village
+    traditional_authority_id = DDETraditionalAuthority.find_by_name("#{params[:filter_value]}").id
+    village_conditions = ["name LIKE (?) AND traditional_authority_id = ?", "%#{params[:search_string]}%", traditional_authority_id]
+
+    villages = DDEVillage.find(:all,:conditions => village_conditions, :order => 'name')
+    villages = villages.map do |v|
+      "<li value='#{v.name}'>#{v.name}</li>"
+    end
+    render :text => villages.join('') + "<li value='Other'>Other</li>" and return
+  end
+
+  # Landmark containing the string given in params[:value]
+  def landmark
+    landmarks = []
+
+    if (DDEPersonAddress rescue false).class.to_s.downcase != "falseclass"
+
+      landmarks = PersonAddress.find(:all, :select => "DISTINCT address1" , :conditions => ["city_village = (?) AND address1 LIKE (?)", "#{params[:filter_value]}", "#{params[:search_string]}%"])
+      landmarks = landmarks.map do |v|
+        "<li value='#{v.address1}'>#{v.address1}</li>"
+      end
+
+    end
+    render :text => landmarks.join('') + "<li value='Other'>Other</li>" and return
   end
 
 end

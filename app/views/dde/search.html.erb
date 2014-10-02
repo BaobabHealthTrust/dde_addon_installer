@@ -130,6 +130,7 @@
         var cell0 = document.createElement("div");
         cell0.style.display = "table-cell";
         cell0.style.height = "100%";
+        cell0.style.verticalAlign = "top";
 
         row.appendChild(cell0);
 
@@ -137,13 +138,14 @@
         cell1.style.display = "table-cell";
         cell1.style.height = "100%";
         cell1.style.width = "70px";
+        cell1.style.verticalAlign = "top";
 
         row.appendChild(cell1);
 
         var navpanel0 = document.createElement("div");
         navpanel0.style.width = "70px";
         navpanel0.style.height = "540px";
-        navpanel0.id = "navpanel";
+        navpanel0.id = "navpanel0";
         navpanel0.style.cssFloat = "right";
         navpanel0.style.backgroundColor = "#e7efeb";
         navpanel0.style.overflow = "hidden";
@@ -170,7 +172,7 @@
         var navpanel1 = document.createElement("div");
         navpanel1.style.width = "70px";
         navpanel1.style.height = "30px";
-        navpanel1.id = "navpanel";
+        navpanel1.id = "navpanel1";
         navpanel1.style.cssFloat = "right";
         navpanel1.style.backgroundColor = "#e7efeb";
         navpanel1.style.overflow = "hidden";
@@ -561,7 +563,7 @@
           </td>
           <td>
             <input type="text" id="given_name" name="given_name" value="" helpText="First Name"
-                   ajaxURL='/person_names/given_names?search_string=' allowFreeText=true/>
+                   ajaxURL='/person_names/given_names?search_string=' allowFreeText=true />
           </td>
         </tr>
         <tr>

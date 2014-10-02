@@ -1,5 +1,7 @@
 #!/usr/bin/env ruby
+require "rubygems"
 require "fileutils"
+require "yaml"
 
 def usage
   puts "\nUsage:\n\t#{__FILE__} PATH ACTION\n\twhere:\n\t\tPATH: is a {valid folder}\n\t\tACTION: is either {install | uninstall}\n\n"
@@ -45,9 +47,55 @@ def install(root)
     exit
   end
   
+  if !File.exists?("#{root}/config/database.yml")
+  
+    puts "\nTarget folder does not seem to be have a valid defined database configuration"
+    
+    exit
+  
+  end
+  
   puts " OK"
   
   puts "Starting installation ..."
+  
+  puts "Loading data into database..."
+  
+  settings = YAML.load_file("#{root}/config/database.yml") rescue {}
+  
+  if settings["development"].nil? and settings["production"].nil? and settings["test"].nil?
+  
+    puts "\nTarget folder does not seem to be have a valid defined database configuration"
+    
+    exit
+  
+  end
+  
+  if !settings["development"].nil?
+  
+    puts "Loading 'development' database..."
+    
+    `mysql -h #{settings["development"]["host"]} -u #{settings["development"]["username"]} -p#{settings["development"]["password"]} #{settings["development"]["database"]} < ./db/villages.sql`
+  
+  end
+  
+  if !settings["production"].nil?
+    
+    puts "Loading 'production' database..."
+    
+    `mysql -h #{settings["production"]["host"]} -u #{settings["production"]["username"]} -p#{settings["production"]["password"]} #{settings["production"]["database"]} < ./db/villages.sql`
+  
+  end
+  
+  if !settings["test"].nil?
+    
+    puts "Loading 'test' database..."
+    
+    `mysql -h #{settings["test"]["host"]} -u #{settings["test"]["username"]} -p#{settings["test"]["password"]} #{settings["test"]["database"]} < ./db/villages.sql`
+  
+  end
+  
+  puts "Done loading data."
   
   copies = [
       "app/views/layouts/ts.html.erb",
@@ -64,7 +112,12 @@ def install(root)
       "config/dde_connection.yml.example",
       "lib/dde.rb",
       "public/images/female.png",
-      "public/images/male.png"
+      "public/images/male.png",
+      "config/globals.yml",
+      "app/models/dde_district.rb",
+      "app/models/dde_region.rb",
+      "app/models/dde_traditional_authority.rb",
+      "app/models/dde_village.rb"
     ]  
     # "app/views/dde/index.html.erb",
       
@@ -336,9 +389,53 @@ def uninstall(root)
     exit
   end
   
+  if !File.exists?("#{root}/config/database.yml")
+  
+    puts "\nTarget folder does not seem to be have a valid defined database configuration"
+    
+    exit
+  
+  end
+  
   puts " OK"
   
   puts "Starting removal ..."
+  
+  puts "Loading data into database..."
+  
+  settings = YAML.load_file("#{root}/config/database.yml") rescue {}
+  
+  if settings["development"].nil? and settings["production"].nil? and settings["test"].nil?
+  
+    puts "\nTarget folder does not seem to be have a valid defined database configuration"
+    
+    exit
+  
+  end
+  
+  if !settings["development"].nil?
+  
+    puts "Unloading 'development' database..."
+    
+    `mysql -h #{settings["development"]["host"]} -u #{settings["development"]["username"]} -p#{settings["development"]["password"]} #{settings["development"]["database"]} < ./db/drop_villages.sql`
+  
+  end  
+  
+  if !settings["production"].nil?
+  
+    puts "Unloading 'production' database..."
+    
+    `mysql -h #{settings["production"]["host"]} -u #{settings["production"]["username"]} -p#{settings["production"]["password"]} #{settings["production"]["database"]} < ./db/drop_villages.sql`
+  
+  end
+  
+  if !settings["test"].nil?
+  
+    puts "Unloading 'test' database..."
+    
+    `mysql -h #{settings["test"]["host"]} -u #{settings["test"]["username"]} -p#{settings["test"]["password"]} #{settings["test"]["database"]} < ./db/drop_villages.sql`
+  
+  end
   
   copies = [
       "app/views/layouts/ts.html.erb",
@@ -356,7 +453,12 @@ def uninstall(root)
       "config/dde_connection.yml.example",
       "lib/dde.rb",
       "public/images/female.png",
-      "public/images/male.png"
+      "public/images/male.png",
+      "config/globals.yml",
+      "app/models/dde_district.rb",
+      "app/models/dde_region.rb",
+      "app/models/dde_traditional_authority.rb",
+      "app/models/dde_village.rb"
     ]
   
   if File.exists?("#{root}/app/views/dde")
