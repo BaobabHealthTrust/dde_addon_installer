@@ -340,8 +340,6 @@
     function ajaxProcessRequest(target) {
         var url = "/dde/process_confirmation";
 
-        console.log(json);
-
         var httpRequest = new XMLHttpRequest();
         httpRequest.onreadystatechange = function () {
             handleAjaxProcessRequest(httpRequest);
@@ -361,8 +359,6 @@
                 aXMLHttpRequest.status == 304)) {
 
             var result = aXMLHttpRequest.responseText;
-
-            console.log(result + " received");
 
             if (__$("json")) {
                 __$("json").innerHTML = result;

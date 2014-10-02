@@ -251,6 +251,16 @@
 
         json.birthdate_estimated = dob_est;
 
+        json.addresses.landmark = (
+                __$("closest_landmark_or_plot_number") ?
+                        __$("closest_landmark_or_plot_number").value : null
+                );
+
+        json.addresses.current_residence = (
+                __$("closest_landmark_or_plot_number") ?
+                        __$("closest_landmark_or_plot_number").value : null
+                );
+
         json.addresses.current_village = (
                 __$("current_location_or_village") ?
                         __$("current_location_or_village").value : null
