@@ -848,7 +848,7 @@ class DdeController < ApplicationController
 
       # TODO: Need to find a way to limit in a better way the number of records returned without skipping any as some will never be seen with the current approach
 
-      break if result.length >= 7
+      # break if result.length >= 7
 
     end if pagesize > 0 and result.length < 8
 
