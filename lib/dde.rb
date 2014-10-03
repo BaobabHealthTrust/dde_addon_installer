@@ -133,9 +133,9 @@ module DDE
           }
       }
 
-      if (local["gender"].downcase.strip != person["gender"].downcase.strip) or
+      if (((local["gender"].downcase.strip != person["gender"].downcase.strip) or
           (local["birthdate"].strip != person["birthdate"].strip) or
-          (local["birthdate_estimated"].to_s.strip.downcase != person["birthdate_estimated"].to_s.strip.downcase)
+          (local["birthdate_estimated"].to_s.strip.downcase != person["birthdate_estimated"].to_s.strip.downcase)) rescue false)
 
         patient.person.update_attributes(
             "gender" => person["gender"],
