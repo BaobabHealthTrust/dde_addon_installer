@@ -144,6 +144,10 @@
         display: none;
     }
 
+    .tt_controls_birth_day #Unknown {
+        display: none;
+    }
+
     .tt_controls_current_city_place_or_area_of_residence #num {
         display: block;
     }
@@ -242,8 +246,11 @@
                             :absoluteMax => Date.today.year,
                             :tt_pageStyleClass => "Numeric NumbersOnly",
                             :tt_onLoad => 'seen(tstCurrentPage);'} %>
+        <% months =  month_name_options.to_a
+           months = months[0 .. 12].to_s
 
-        <%= select_tag "person[birth_month]", month_name_options,
+        %>
+        <%= select_tag "person[birth_month]", months,
                        {:helpText => 'Month of Birth',
                         :condition => '$("person_birth_year").value.toLowerCase() != "unknown"'} %>
 
@@ -255,7 +262,13 @@
                             :condition => '$("person_birth_year").value == "Unknown"',
                             :tt_pageStyleClass => "Numeric NumbersOnly"} %>
 
-        <%= text_field_tag "person[birth_day]", nil, :field_type => 'number', :helpText => 'Birth Day', :absoluteMin => 1, :absoluteMax => 31, :condition => '($("person_birth_year").value != "Unknown") && ($("person_birth_month").value != "Unknown")', :tt_onLoad => "getDayOfMonthPicker($('person_birth_year').value,$('person_birth_month').value)" %>
+        <%= text_field_tag "person[birth_day]", nil,
+                           :field_type => 'number',
+                           :helpText => 'Birth Day',
+                           :absoluteMin => 1,
+                           :absoluteMax => 31,
+                           :condition => '($("person_birth_year").value != "Unknown") && ($("person_birth_month").value != "Unknown")',
+                           :tt_onLoad => "getDayOfMonthPicker($('person_birth_year').value,$('person_birth_month').value)" %>
 
     <% when 'city_village
     ' %>
@@ -384,7 +397,11 @@
         %>
 
     <% when 'occupation' %>
-        <%= select_tag "person[attributes][occupation]", options_for_select([" ", "Housewife", "Farmer", "Police", "Soldier", "Business", "Teacher", "Student", "Healthcare Worker"].sort.concat(["Other"]), params[:occupation]), {:helpText => 'Occupation'} %>
+        <%= select_tag "person[attributes][occupation]",
+                       options_for_select(['','Driver','Housewife','Messenger','Business','Farmer','Salesperson','Teacher',
+                                           'Student','Security guard','Domestic worker', 'Police','Office worker',
+                                           'Mechanic','Prisoner','Craftsman','Healthcare Worker','Soldier'].sort.concat(["Other", "Unknown"]),
+                                          params[:occupation]), {:helpText => 'Occupation'} %>
     <% end %>
 
     <%= hidden_field_tag("person_id", (params[:id] || params[:patient_id])) %>
