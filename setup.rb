@@ -77,6 +77,10 @@ def install(root)
     
     `mysql -h #{settings["development"]["host"]} -u #{settings["development"]["username"]} -p#{settings["development"]["password"]} #{settings["development"]["database"]} < ./db/villages.sql`
   
+    `mysql -h #{settings["development"]["host"]} -u #{settings["development"]["username"]} -p#{settings["development"]["password"]} #{settings["development"]["database"]} < ./db/person_attribute_type.sql`
+    
+    `mysql -h #{settings["development"]["host"]} -u #{settings["development"]["username"]} -p#{settings["development"]["password"]} #{settings["development"]["database"]} < ./db/countries.sql`
+  
   end
   
   if !settings["production"].nil?
@@ -85,6 +89,10 @@ def install(root)
     
     `mysql -h #{settings["production"]["host"]} -u #{settings["production"]["username"]} -p#{settings["production"]["password"]} #{settings["production"]["database"]} < ./db/villages.sql`
   
+    `mysql -h #{settings["production"]["host"]} -u #{settings["production"]["username"]} -p#{settings["production"]["password"]} #{settings["production"]["database"]} < ./db/person_attribute_type.sql`
+  
+    `mysql -h #{settings["production"]["host"]} -u #{settings["production"]["username"]} -p#{settings["production"]["password"]} #{settings["production"]["database"]} < ./db/countries.sql`
+  
   end
   
   if !settings["test"].nil?
@@ -92,6 +100,10 @@ def install(root)
     puts "Loading 'test' database..."
     
     `mysql -h #{settings["test"]["host"]} -u #{settings["test"]["username"]} -p#{settings["test"]["password"]} #{settings["test"]["database"]} < ./db/villages.sql`
+  
+    `mysql -h #{settings["test"]["host"]} -u #{settings["test"]["username"]} -p#{settings["test"]["password"]} #{settings["test"]["database"]} < ./db/person_attribute_type.sql`
+  
+    `mysql -h #{settings["test"]["host"]} -u #{settings["test"]["username"]} -p#{settings["test"]["password"]} #{settings["test"]["database"]} < ./db/countries.sql`
   
   end
   

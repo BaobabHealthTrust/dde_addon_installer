@@ -118,7 +118,7 @@ module DDE
               "home_phone_number" => (patient.person.person_attributes.find_by_person_attribute_type_id(PersonAttributeType.find_by_name("Home Phone Number").id).value rescue nil),
               "office_phone_number" => (patient.person.person_attributes.find_by_person_attribute_type_id(PersonAttributeType.find_by_name("Office Phone Number").id).value rescue nil),
               "race" => (patient.person.person_attributes.find_by_person_attribute_type_id(PersonAttributeType.find_by_name("Race").id).value rescue nil),
-              "country_of_residence" => (patient.person.person_attributes.find_by_person_attribute_type_id(PersonAttributeType.find_by_name("Current Place Of Residence").id).value rescue nil),
+              "country_of_residence" => (patient.person.person_attributes.find_by_person_attribute_type_id(PersonAttributeType.find_by_name("Country of Residence").id).value rescue nil),
               "citizenship" => (patient.person.person_attributes.find_by_person_attribute_type_id(PersonAttributeType.find_by_name("Citizenship").id).value rescue nil)
           },
           "patient" => {
@@ -192,7 +192,7 @@ module DDE
           {"race" => "Race"},
           {"citizenship" => "Citizenship"},
           {"office_phone_number" => "Office Phone Number"},
-          {"country_of_residence" => "Current Place Of Residence"}
+          {"country_of_residence" => "Country of Residence"}
       ]
 
       fields.each do |field|
@@ -330,7 +330,7 @@ module DDE
         :value => params["person_attributes"]["citizenship"]) unless params["person_attributes"]["citizenship"].blank? rescue nil
 
     person.person_attributes.create(
-        :person_attribute_type_id => PersonAttributeType.find_by_name("Current Place Of Residence").person_attribute_type_id,
+        :person_attribute_type_id => PersonAttributeType.find_by_name("Country of Residence").person_attribute_type_id,
         :value => params["person_attributes"]["country_of_residence"]) unless params["person_attributes"]["country_of_residence"].blank? rescue nil
 
     # TODO handle the birthplace attribute
