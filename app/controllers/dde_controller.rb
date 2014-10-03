@@ -109,7 +109,7 @@ class DdeController < ApplicationController
         "patient" => {
             "identifiers" => (patient.patient_identifiers.collect { |id| {id.type.name => id.identifier} if id.type.name.downcase != "national id" }.delete_if { |x| x.nil? } rescue [])
         },
-        "birthdate_estimated" => ((patient.person.birthdate_estimated rescue 0) == 1 ? true : false),
+        "birthdate_estimated" => ((patient.person.birthdate_estimated rescue 0).to_s.strip == '1' ? true : false),
         "addresses" => {
             "current_residence" => (address.address1 rescue nil),
             "current_village" => (address.city_village rescue nil),
@@ -137,7 +137,7 @@ class DdeController < ApplicationController
           "person" => {
               "display" => ("#{person.names.last.given_name} #{person.names.last.family_name}" rescue nil),
               "age" => ((Date.today - person.birthdate.to_date).to_i / 365 rescue nil),
-              "birthdateEstimated" => ((person.birthdate_estimated == 1 ? true : false) rescue false),
+              "birthdateEstimated" => ((person.birthdate_estimated.to_s.strip == '1' ? true : false) rescue false),
               "gender" => (person.gender rescue nil),
               "preferredAddress" => {
                   "cityVillage" => (person.addresses.last.city_village rescue nil)
@@ -297,6 +297,7 @@ class DdeController < ApplicationController
   end
 
   def edit_demographics
+
     @field = params[:field]
 
     if params[:id].blank?
@@ -307,9 +308,11 @@ class DdeController < ApplicationController
     @person = Person.find(person_id)
 
     @patient = @person.patient rescue nil
+
   end
 
   def update_demographics
+
     @settings = YAML.load_file("#{Rails.root}/config/dde_connection.yml")[Rails.env] rescue {}
 
     patient = Person.find(params[:person_id]).patient rescue nil
@@ -532,7 +535,7 @@ class DdeController < ApplicationController
               "patient" => {
                   "identifiers" => (patient.patient_identifiers.collect { |id| {id.type.name => id.identifier} if id.type.name.downcase != "national id" }.delete_if { |x| x.nil? } rescue [])
               },
-              "birthdate_estimated" => ((patient.person.birthdate_estimated rescue 0) == 1 ? true : false),
+              "birthdate_estimated" => ((patient.person.birthdate_estimated rescue 0).to_s.strip == '1' ? true : false),
               "addresses" => {
                   "current_residence" => (address.address1 rescue nil),
                   "current_village" => (address.city_village rescue nil),
@@ -604,7 +607,7 @@ class DdeController < ApplicationController
             "patient" => {
                 "identifiers" => (patient.patient_identifiers.collect { |id| {id.type.name => id.identifier} if id.type.name.downcase != "national id" }.delete_if { |x| x.nil? } rescue [])
             },
-            "birthdate_estimated" => ((patient.person.birthdate_estimated rescue 0) == 1 ? true : false),
+            "birthdate_estimated" => ((patient.person.birthdate_estimated rescue 0).to_s.strip == '1' ? true : false),
             "addresses" => {
                 "current_residence" => (address.address1 rescue nil),
                 "current_village" => (address.city_village rescue nil),
@@ -678,7 +681,7 @@ class DdeController < ApplicationController
             "patient" => {
                 "identifiers" => (patient.patient_identifiers.collect { |id| {id.type.name => id.identifier} if id.type.name.downcase != "national id" }.delete_if { |x| x.nil? } rescue [])
             },
-            "birthdate_estimated" => ((patient.person.birthdate_estimated rescue 0) == 1 ? true : false),
+            "birthdate_estimated" => ((patient.person.birthdate_estimated rescue 0).to_s.strip == '1' ? true : false),
             "addresses" => {
                 "current_residence" => (address.address1 rescue nil),
                 "current_village" => (address.city_village rescue nil),
@@ -826,7 +829,7 @@ class DdeController < ApplicationController
           "patient" => {
               "identifiers" => (patient.patient_identifiers.collect { |id| {id.type.name => id.identifier} if id.type.name.downcase != "national id" }.delete_if { |x| x.nil? } rescue [])
           },
-          "birthdate_estimated" => ((patient.person.birthdate_estimated rescue 0) == 1 ? true : false),
+          "birthdate_estimated" => ((patient.person.birthdate_estimated rescue 0).to_s.strip == '1' ? true : false),
           "addresses" => {
               "current_residence" => (address.address1 rescue nil),
               "current_village" => (address.city_village rescue nil),
@@ -1002,7 +1005,7 @@ class DdeController < ApplicationController
 
       record["Birthdate"] = identifier.patient.person.birthdate rescue nil
 
-      record["Birthdate Estimated"] = identifier.patient.person.birthdate_estimated rescue nil
+      record["Birthdate Estimated"] = ((identifier.patient.person.birthdate_estimated rescue nil).to_s.strip == '1' ? true : false)
 
       attributes = ["Citizenship", "Occupation", "Home Phone Number", "Cell Phone Number", "Office Phone Number", "Race"]
 
