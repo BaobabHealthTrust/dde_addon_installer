@@ -8,7 +8,6 @@ config/environments/
 config/initializers/
 config/locales/
 config/routes.rb
-db/
 doc/
 log/
 script/

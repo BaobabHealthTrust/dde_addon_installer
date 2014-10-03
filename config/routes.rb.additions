@@ -15,5 +15,6 @@
   map.ajax_search '/ajax_search', :controller => 'dde', :action => 'ajax_search'
   map.edit_demographics '/patients/edit_demographics', :controller => 'dde', :action => 'edit_patient'
   map.demographics '/people/demographics/:id', :controller => 'dde', :action => 'edit_patient'
+  map.demographics '/patients/demographics/:id', :controller => 'dde', :action => 'edit_patient'
   # ------------------------------- END OF INSTALLATION GENERATED ----------------------------------------------
   

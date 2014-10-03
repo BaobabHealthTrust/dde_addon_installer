@@ -569,9 +569,15 @@ def modify_clinic_index_page(root)
           end
         
           if !inserted
-                      
-              string = string + stub
-              
+
+              output = '<html><head><title>Clinic Index</title><!--script type="text/javascript" language="javascript" ' +
+                  'src="/javascripts/dashboard.js" ></script--><script language="javascript" type="text/javascript" ' +
+                  'src="/touchscreentoolkit/lib/javascripts/touchScreenToolkit.js" defer></script></head><body>'
+
+              output = output + string + stub + "</body></html>"
+
+              string = output
+
               inserted = true            
           
           end
