@@ -397,7 +397,11 @@
         %>
 
     <% when 'occupation' %>
-        <%= select_tag "person[attributes][occupation]", options_for_select([" ", "Housewife", "Farmer", "Police", "Soldier", "Business", "Teacher", "Student", "Healthcare Worker"].sort.concat(["Other"]), params[:occupation]), {:helpText => 'Occupation'} %>
+        <%= select_tag "person[attributes][occupation]",
+                       options_for_select(['','Driver','Housewife','Messenger','Business','Farmer','Salesperson','Teacher',
+                                           'Student','Security guard','Domestic worker', 'Police','Office worker',
+                                           'Mechanic','Prisoner','Craftsman','Healthcare Worker','Soldier'].sort.concat(["Other", "Unknown"]),
+                                          params[:occupation]), {:helpText => 'Occupation'} %>
     <% end %>
 
     <%= hidden_field_tag("person_id", (params[:id] || params[:patient_id])) %>
