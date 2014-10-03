@@ -13,5 +13,7 @@
   map.process_confirmation '/process_confirmation', :controller => 'dde', :action => {'process_confirmation' => [:post]}
   map.patient_not_found '/patient_not_found/:id', :controller => 'dde', :action => 'patient_not_found'
   map.ajax_search '/ajax_search', :controller => 'dde', :action => 'ajax_search'
+  map.edit_demographics '/patients/edit_demographics', :controller => 'dde', :action => 'edit_patient'
+  map.demographics '/people/demographics/:id', :controller => 'dde', :action => 'edit_patient'
   # ------------------------------- END OF INSTALLATION GENERATED ----------------------------------------------
   
