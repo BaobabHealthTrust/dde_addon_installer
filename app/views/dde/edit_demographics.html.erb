@@ -291,7 +291,7 @@
 
         <p><label for="person_addresses_township_division">Traditional Authority(T/A)</label></br>
 
-          <%= text_field "person[addresses][township_division]", nil,
+          <%= text_field_tag "person[addresses][township_division]", params[:township_division],
                          {:id => "person_addresses_township_division",
                          :condition => '$("state_province").value != "Other"',
                          :helpText => 'Traditional Authority (T/A) or area of residence',
