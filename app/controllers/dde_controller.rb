@@ -355,6 +355,11 @@ class DdeController < ApplicationController
 
     end
 
+    if (params[:person][:attributes]["citizenship"] == "Other" rescue false)
+
+      params[:person][:attributes]["citizenship"] = params[:person][:attributes]["race"]
+    end
+
     identifiers = []
 
     patient.patient_identifiers.each { |id|

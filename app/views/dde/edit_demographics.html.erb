@@ -292,12 +292,12 @@
         <p><label for="person_addresses_township_division">Traditional Authority(T/A)</label></br>
 
           <%= text_field_tag "person[addresses][township_division]", params[:township_division],
-                         {:id => "person_addresses_township_division",
-                         :condition => '$("state_province").value != "Other"',
-                         :helpText => 'Traditional Authority (T/A) or area of residence',
-                         :tt_requireNextClick => false, :ajaxURL => '',
-                         :tt_pageStyleClass => "azButton",
-                         :tt_onLoad => "set_ajaxURL_for_suggestions('/people/traditional_authority/TraditionalAuthority?filter_value=' ,document.getElementById('state_province').value);$('nextButton').style.display = 'none';"} %>
+                             {:id => "person_addresses_township_division",
+                              :condition => '$("state_province").value != "Other"',
+                              :helpText => 'Traditional Authority (T/A) or area of residence',
+                              :tt_requireNextClick => false, :ajaxURL => '',
+                              :tt_pageStyleClass => "azButton",
+                              :tt_onLoad => "set_ajaxURL_for_suggestions('/people/traditional_authority/TraditionalAuthority?filter_value=' ,document.getElementById('state_province').value);$('nextButton').style.display = 'none';"} %>
         </p>
 
 
@@ -373,12 +373,15 @@
 
 
         <%= select_tag("person[attributes][citizenship]", options_for_select([" ", "Malawian", "Other"], params[:citizenship]),
+                       :id => "nationality",
                        :helpText => "Nationality",
                        :field_type => 'text') %>
 
-        <%= text_field_tag "person[attributes][race]", nil, :field_type => 'text',
-                           :helpText => "Race",
-                           :condition => '($("person_attributes_citizenship").value != "Malawian")' %>
+        <%= text_field_tag "person[attributes][race]", nil,
+                           :field_type => 'text',
+                           :helpText => "Specify Nationality",
+                           :condition => '($("nationality").value != "Malawian")'
+        %>
 
     <% when 'occupation' %>
         <%= select_tag "person[attributes][occupation]", options_for_select([" ", "Housewife", "Farmer", "Police", "Soldier", "Business", "Teacher", "Student", "Healthcare Worker"].sort.concat(["Other"]), params[:occupation]), {:helpText => 'Occupation'} %>
