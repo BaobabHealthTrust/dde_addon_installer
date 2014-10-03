@@ -396,9 +396,6 @@ class DdeController < ApplicationController
             "office_phone_number" => (!(params[:person][:attributes][:office_phone_number] rescue nil).blank? ? (params[:person][:attributes][:office_phone_number] rescue nil) :
                     (patient.person.person_attributes.find_by_person_attribute_type_id(PersonAttributeType.find_by_name("Office Phone Number").id).value rescue nil)),
 
-            "race" => (!(params[:person][:attributes][:race] rescue nil).blank? ? (params[:person][:attributes][:race] rescue nil) :
-                        (patient.person.person_attributes.find_by_person_attribute_type_id(PersonAttributeType.find_by_name("Race").id).value rescue nil)),
-
             "country_of_residence" => (!(params[:person][:attributes][:country_of_residence] rescue nil).blank? ? (params[:person][:attributes][:country_of_residence] rescue nil) :
                             (patient.person.person_attributes.find_by_person_attribute_type_id(PersonAttributeType.find_by_name("Current Place Of Residence").id).value rescue nil)),
 
