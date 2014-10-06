@@ -291,7 +291,9 @@
                         __$("district_of_origin").value : null
                 );
 
-        json.person_attributes.country_of_residence = null;
+        json.person_attributes.country_of_residence = (__$("country") ?
+                    __$("country").value : null
+                );
 
         json.person_attributes.citizenship = (
                 __$("nationality") ?
