@@ -1236,4 +1236,26 @@ class DdeController < ApplicationController
     render :text => landmarks.join('') + "<li value='Other'>Other</li>" and return
   end
 
+  # Countries containing the string given in params[:value]
+  def country
+    country_conditions = ["name LIKE (?)", "%#{params[:search_string]}%"]
+
+    countries = DDECountry.find(:all,:conditions => country_conditions, :order => 'weight')
+    countries = countries.map do |v|
+      "<li value='#{v.name}'>#{v.name}</li>"
+    end
+    render :text => countries.join('') + "<li value='Other'>Other</li>" and return
+  end
+
+  # Nationalities containing the string given in params[:value]
+  def nationality
+    nationalty_conditions = ["name LIKE (?)", "%#{params[:search_string]}%"]
+
+    nationalities = DDENationality.find(:all,:conditions => nationalty_conditions, :order => 'weight')
+    nationalities = nationalities.map do |v|
+      "<li value='#{v.name}'>#{v.name}</li>"
+    end
+    render :text => nationalities.join('') + "<li value='Other'>Other</li>" and return
+  end
+
 end

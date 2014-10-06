@@ -129,7 +129,9 @@ def install(root)
       "app/models/dde_district.rb",
       "app/models/dde_region.rb",
       "app/models/dde_traditional_authority.rb",
-      "app/models/dde_village.rb"
+      "app/models/dde_village.rb",
+      "app/models/dde_nationality.rb",
+      "app/models/dde_country.rb"
     ]  
     # "app/views/dde/index.html.erb",
       
@@ -470,7 +472,9 @@ def uninstall(root)
       "app/models/dde_district.rb",
       "app/models/dde_region.rb",
       "app/models/dde_traditional_authority.rb",
-      "app/models/dde_village.rb"
+      "app/models/dde_village.rb",
+      "app/models/dde_nationality.rb",
+      "app/models/dde_country.rb"
     ]
   
   if File.exists?("#{root}/app/views/dde")

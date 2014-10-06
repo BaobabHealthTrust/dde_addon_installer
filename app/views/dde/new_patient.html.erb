@@ -482,17 +482,18 @@
                         :absoluteMax => 120,
                         :helptext => "Age"} %>
 
-    <%= select_tag "person[citizenship]", options_for_select([["", ""],
-                                                              ["Malawian", "Malawian"], ["Other", "Other"]]),
+    <%= text_field_tag "person[citizenship]", nil,
                    {:id => "nationality",
-                    :tt_onLoad => "$('nextButton').style.display = 'block';",
-                    :helptext => "Nationality"} if @show_nationality %>
+                    :ajaxURL => "",
+                    :tt_requireNextClick => false,
+                    :tt_onLoad => "$('nextButton').style.display = 'none'; set_ajaxURL_for_suggestions('/dde/nationality?filter_value=', __$('nationality').value);",
+                    :helptext => "Nationality"} if @show_region_of_origin %>
 
     <%= text_field_tag "person[race]", nil,
                        {:id => "race",
                         :helptext => "Specify nationality",
                         :tt_onLoad => "$('nextButton').style.display = 'block';",
-                        :condition => '__$("nationality").value == "Other"'} if @show_nationality %>
+                        :condition => '__$("nationality").value == "Other"'} if @show_region_of_origin %>
 
     <%= select_tag "REGION OF ORIGIN", options_for_select([["Northern Region", "Northern+Region"],
                                                            ["Central Region", "Central+Region"], ["Southern Region", "Southern+Region"], ["", ""]]),
@@ -526,10 +527,18 @@
                     :tt_onLoad => "set_ajaxURL_for_suggestions('/dde/village?filter_value=', __$('ancestral_traditional_authority').value);",
                     :helptext => "Home Village"} if @show_region_of_origin %>
 
+    <%= text_field_tag "person[country]", nil,
+                   {:id => "country",
+                    :tt_requireNextClick => false,
+                    :ajaxURL => "",
+                    :tt_onLoad => "$('nextButton').style.display = 'none'; set_ajaxURL_for_suggestions('/dde/country?filter_value=', __$('country').value); ",
+                    :helptext => "Country of Residence"} if @show_current_district %>
+
     <%= select_tag "CURRENT REGION", options_for_select([["Northern Region", "Northern+Region"],
                                                          ["Central Region", "Central+Region"], ["Southern Region", "Southern+Region"], ["", ""]]),
                    {:id => "current_region",
                     :tt_requireNextClick => false,
+                    :condition => "__$('country').value == 'Malawi'",
                     :tt_onLoad => "$('nextButton').style.display = 'none';",
                     :helptext => "Current Region"} if @show_current_district %>
 
@@ -537,6 +546,7 @@
                    {:id => "current_district",
                     :tt_requireNextClick => false,
                     :ajaxURL => "",
+                    :condition => "__$('country').value == 'Malawi'",
                     :tt_onLoad => "set_ajaxURL_for_suggestions('/dde/district?filter_value=', __$('current_region').value); ",
                     :helptext => "Current District"} if @show_current_district %>
 
@@ -544,6 +554,7 @@
                    {:id => "current_area_of_residence",
                     :tt_requireNextClick => false,
                     :ajaxURL => "",
+                    :condition => "__$('country').value == 'Malawi'",
                     :tt_onLoad => "$('nextButton').style.display = 'none'; set_ajaxURL_for_suggestions('/dde/traditional_authority?filter_value=', __$('current_district').value);",
                     :helptext => "Current Area Of Residence"} if @show_current_t_a %>
 
@@ -551,6 +562,7 @@
                    {:id => "current_location_or_village",
                     :tt_requireNextClick => false,
                     :ajaxURL => "",
+                    :condition => "__$('country').value == 'Malawi'",
                     :tt_onLoad => "$('nextButton').style.display = 'none'; set_ajaxURL_for_suggestions('/dde/village?filter_value=', __$('current_area_of_residence').value);",
                     :helptext => "Current Location Or Village"} if @show_current_village %>
 
@@ -561,6 +573,7 @@
                                 '(Please do not enter words like: near, close to, infront of, behind)</div>',
                         :allowFreeText => true,
                         :ajaxURL => '',
+                        :condition => "__$('country').value == 'Malawi'",
                         :tt_pageStyleClass => "azButton",
                         :tt_onLoad => "$('nextButton').style.display = 'block'; set_ajaxURL_for_suggestions('/people/landmark?filter_value='
                          ,document.getElementById('current_location_or_village').value);"} if @show_current_landmark%>
