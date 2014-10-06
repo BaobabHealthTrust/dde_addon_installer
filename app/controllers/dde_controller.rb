@@ -315,8 +315,6 @@ class DdeController < ApplicationController
 
   def update_demographics
 
-    # raise params.inspect
-
     @settings = YAML.load_file("#{Rails.root}/config/dde_connection.yml")[Rails.env] rescue {}
 
     patient = Person.find(params[:person_id]).patient rescue nil
@@ -398,13 +396,13 @@ class DdeController < ApplicationController
                 (patient.person.person_attributes.find_by_person_attribute_type_id(PersonAttributeType.find_by_name("Home Phone Number").id).value rescue nil)),
 
             "office_phone_number" => (!(params[:person][:attributes][:office_phone_number] rescue nil).blank? ? (params[:person][:attributes][:office_phone_number] rescue nil) :
-                    (patient.person.person_attributes.find_by_person_attribute_type_id(PersonAttributeType.find_by_name("Office Phone Number").id).value rescue nil)),
+                (patient.person.person_attributes.find_by_person_attribute_type_id(PersonAttributeType.find_by_name("Office Phone Number").id).value rescue nil)),
 
             "country_of_residence" => (!(params[:person][:attributes][:country_of_residence] rescue nil).blank? ? (params[:person][:attributes][:country_of_residence] rescue nil) :
-                            (patient.person.person_attributes.find_by_person_attribute_type_id(PersonAttributeType.find_by_name("Country of Residence").id).value rescue nil)),
+                (patient.person.person_attributes.find_by_person_attribute_type_id(PersonAttributeType.find_by_name("Country of Residence").id).value rescue nil)),
 
             "citizenship" => (!(params[:person][:attributes][:citizenship] rescue nil).blank? ? (params[:person][:attributes][:citizenship] rescue nil) :
-                                (patient.person.person_attributes.find_by_person_attribute_type_id(PersonAttributeType.find_by_name("Citizenship").id).value rescue nil))
+                (patient.person.person_attributes.find_by_person_attribute_type_id(PersonAttributeType.find_by_name("Citizenship").id).value rescue nil))
         },
         "birthdate" => dob,
         "patient" => {
@@ -412,13 +410,13 @@ class DdeController < ApplicationController
         },
         "birthdate_estimated" => estimate,
         "addresses" => {
-            "current_residence" => (!(params[:person][:attributes][:country_of_residence] rescue nil).blank? ? (params[:person][:addresses][:address1] rescue nil) : (address.address1 rescue nil)),
-            "current_village" => (!(params[:person][:attributes][:country_of_residence] rescue nil).blank? ? (params[:person][:addresses][:city_village] rescue nil) : (address.city_village rescue nil)),
-            "current_ta" => (!(params[:person][:attributes][:country_of_residence] rescue nil).blank? ? (params[:person][:addresses][:township_division] rescue nil) : (address.township_division rescue nil)),
-            "current_district" => (!(params[:person][:attributes][:country_of_residence] rescue nil).blank? ? (params[:person][:addresses][:state_province] rescue nil) : (address.state_province rescue nil)),
-            "home_village" => (!(params[:person][:attributes][:citizenship] rescue nil).blank? ? (params[:person][:addresses][:neighborhood_cell] rescue nil) : (address.neighborhood_cell rescue nil)),
-            "home_ta" => (!(params[:person][:attributes][:citizenship] rescue nil).blank? ? (params[:person][:addresses][:county_district] rescue nil) : (address.county_district rescue nil)),
-            "home_district" => (!(params[:person][:attributes][:citizenship] rescue nil).blank? ? (params[:person][:addresses][:address2] rescue nil) : (address.address2 rescue nil))
+            "current_residence" => (!(params[:person][:addresses][:address1] rescue nil).blank? ? (params[:person][:addresses][:address1] rescue nil) : (address.address1 rescue nil)),
+            "current_village" => (!(params[:person][:addresses][:city_village] rescue nil).blank? ? (params[:person][:addresses][:city_village] rescue nil) : (address.city_village rescue nil)),
+            "current_ta" => (!(params[:person][:addresses][:township_division] rescue nil).blank? ? (params[:person][:addresses][:township_division] rescue nil) : (address.township_division rescue nil)),
+            "current_district" => (!(params[:person][:addresses][:state_province] rescue nil).blank? ? (params[:person][:addresses][:state_province] rescue nil) : (address.state_province rescue nil)),
+            "home_village" => (!(params[:person][:addresses][:neighborhood_cell] rescue nil).blank? ? (params[:person][:addresses][:neighborhood_cell] rescue nil) : (address.neighborhood_cell rescue nil)),
+            "home_ta" => (!(params[:person][:addresses][:county_district] rescue nil).blank? ? (params[:person][:addresses][:county_district] rescue nil) : (address.county_district rescue nil)),
+            "home_district" => (!(params[:person][:addresses][:address2] rescue nil).blank? ? (params[:person][:addresses][:address2] rescue nil) : (address.address2 rescue nil))
         }
     }
 
@@ -1194,7 +1192,7 @@ class DdeController < ApplicationController
 
     districts = DDEDistrict.find(:all,:conditions => region_conditions, :order => 'name')
     districts = districts.map do |d|
-      "<li value='#{d.name}'>#{d.name}</li>"
+      "<li value=\"#{d.name}\">#{d.name}</li>"
     end
     render :text => districts.join('') + "<li value='Other'>Other</li>" and return
   end
@@ -1206,7 +1204,7 @@ class DdeController < ApplicationController
 
     traditional_authorities = DDETraditionalAuthority.find(:all,:conditions => traditional_authority_conditions, :order => 'name')
     traditional_authorities = traditional_authorities.map do |t_a|
-      "<li value='#{t_a.name}'>#{t_a.name}</li>"
+      "<li value=\"#{t_a.name}\">#{t_a.name}</li>"
     end
     render :text => traditional_authorities.join('') + "<li value='Other'>Other</li>" and return
   end
@@ -1218,7 +1216,7 @@ class DdeController < ApplicationController
 
     villages = DDEVillage.find(:all,:conditions => village_conditions, :order => 'name')
     villages = villages.map do |v|
-      "<li value='#{v.name}'>#{v.name}</li>"
+      "<li value=\"#{v.name}\">#{v.name}</li>"
     end
     render :text => villages.join('') + "<li value='Other'>Other</li>" and return
   end
@@ -1231,33 +1229,11 @@ class DdeController < ApplicationController
 
       landmarks = PersonAddress.find(:all, :select => "DISTINCT address1" , :conditions => ["city_village = (?) AND address1 LIKE (?)", "#{params[:filter_value]}", "#{params[:search_string]}%"])
       landmarks = landmarks.map do |v|
-        "<li value='#{v.address1}'>#{v.address1}</li>"
+        "<li value=\"#{v.address1}\">#{v.address1}</li>"
       end
 
     end
     render :text => landmarks.join('') + "<li value='Other'>Other</li>" and return
-  end
-
-  # Countries containing the string given in params[:value]
-  def country
-    country_conditions = ["name LIKE (?)", "%#{params[:search_string]}%"]
-
-    countries = DDECountry.find(:all,:conditions => country_conditions, :order => 'weight')
-    countries = countries.map do |v|
-      "<li value='#{v.name}'>#{v.name}</li>"
-    end
-    render :text => countries.join('') + "<li value='Other'>Other</li>" and return
-  end
-
-  # Nationalities containing the string given in params[:value]
-  def nationality
-    nationalty_conditions = ["name LIKE (?)", "%#{params[:search_string]}%"]
-
-    nationalities = DDENationality.find(:all,:conditions => nationalty_conditions, :order => 'weight')
-    nationalities = nationalities.map do |v|
-      "<li value='#{v.name}'>#{v.name}</li>"
-    end
-    render :text => nationalities.join('') + "<li value='Other'>Other</li>" and return
   end
 
 end
