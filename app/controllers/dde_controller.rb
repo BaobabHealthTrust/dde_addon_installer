@@ -1225,15 +1225,10 @@ class DdeController < ApplicationController
 
   # Landmark containing the string given in params[:value]
   def landmark
-    landmarks = []
 
-    if (DDEPersonAddress rescue false).class.to_s.downcase != "falseclass"
-
-      landmarks = PersonAddress.find(:all, :select => "DISTINCT address1" , :conditions => ["city_village = (?) AND address1 LIKE (?)", "#{params[:filter_value]}", "#{params[:search_string]}%"])
-      landmarks = landmarks.map do |v|
-        "<li value=\"#{v.address1}\">#{v.address1}</li>"
-      end
-
+    landmarks = ["", "Market", "School", "Police", "Church", "Borehole", "Graveyard"]
+    landmarks = landmarks.map do |v|
+      "<li value='#{v}'>#{v}</li>"
     end
     render :text => landmarks.join('') + "<li value='Other'>Other</li>" and return
   end
