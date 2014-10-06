@@ -355,11 +355,12 @@
                             :ajaxURL => "",
                             :tt_requireNextClick => false,
                             :tt_onLoad => "$('nextButton').style.display = 'none'; set_ajaxURL_for_suggestions('/dde/nationality?filter_value=', __$('nationality').value);",
-                            :helptext => "Nationality"} if @show_region_of_origin %>
+                            :helptext => "Nationality"} %>
 
         <p><label for="region_region_name">Region of Origin</label></br>
           <%= text_field "region", 'region_name',
                          :tt_requireNextClick => false,
+                         :condition => "__$('nationality').value == 'Malawian'",
                          :ajaxURL => '/people/region/Region?field=role&value=',
                          :tt_onLoad => "$('nextButton').style.display = 'none';" %></p>
 
@@ -367,6 +368,7 @@
                            params[:state_province], {:field_type => 'alpha',
                                                      :helpText => 'Home District',
                                                      :id => "address2",
+                                                     :condition => "__$('nationality').value == 'Malawian'",
                                                      :tt_requireNextClick => false,
                                                      :ajaxURL => '/s earch/district?search_string=',
                                                      :allowFreeText => true,
@@ -380,6 +382,7 @@
                             :helpText => "Tradional Authority (T/A)",
                             :ajaxURL => '/search/ta?search_string=',
                             :allowFreeText => false,
+                            :condition => "__$('nationality').value == 'Malawian'",
                             :tt_requireNextClick => false,
                             :tt_onLoad => "$('nextButton').style.display = 'none'; set_ajaxURL_for_suggestions('/people/traditional_authority/TraditionalAuthority?filter_value=' ,document.getElementById('address2').value);"
                            } %>
@@ -390,6 +393,7 @@
                                    :helpText => "Home Village",
                                    :tt_requireNextClick => true,
                                    :tt_pageStyleClass => "azButton",
+                                   :condition => "__$('nationality').value == 'Malawian'",
                                    :ajaxURL => '/people/village?search_string=',
                                    :allowFreeText => false,
                                    :tt_onLoad => "$('nextButton').style.display = 'block'; set_ajaxURL_for_suggestions('/people/village/Village?filter_value=' ,document.getElementById('person_addresses_county_district').value);"} %>
