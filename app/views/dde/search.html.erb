@@ -580,9 +580,9 @@
             Gender
           </td>
           <td>
-            <select id="gender" name="gender" value="" helpText="Gender">
+            <select id="gender" name="gender" value="" helpText="Gender" condition="<%= (!@globals["default_gender_female"].nil? and @globals["default_gender_female"] == true ? false : true) %>">
               <option></option>
-              <option value="F">Female</option>
+              <option value="F" <%= (!@globals["default_gender_female"].nil? and @globals["default_gender_female"] == true ? "selected" : "") %> >Female</option>
               <option value="M">Male</option>
             </select>
           </td>

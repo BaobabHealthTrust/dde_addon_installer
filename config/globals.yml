@@ -19,6 +19,7 @@ default: &default
   show_home_phone_number: true
   show_occupation: true
   show_nationality: true
+  default_gender_female: false
   
 development:
   <<: *default
