@@ -24,6 +24,8 @@ class DdeController < ApplicationController
   def search
     @settings = YAML.load_file("#{Rails.root}/config/dde_connection.yml")[Rails.env] rescue {}
 
+    @globals = YAML.load_file("#{Rails.root}/config/globals.yml")[Rails.env] rescue {}
+
     render :layout => false
   end
 

@@ -434,6 +434,7 @@
     <%= text_field_tag "person[names][middle_name]", nil,
                        {:id => "middle_name",
                         :optional => true,
+                        :tt_onLoad => "if('#{params[:given_name]}'.trim().length > 0){if(__$('backButton')){__$('backButton').style.display='none';}}",
                         :helptext => "Middle Name"} if @show_middle_name %>
 
     <%= text_field_tag "person[names][family_name]", params[:family_name],
