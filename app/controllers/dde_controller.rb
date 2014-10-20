@@ -421,8 +421,13 @@ class DdeController < ApplicationController
             "home_district" => (!(params[:person][:attributes][:citizenship] rescue nil).blank? ? (params[:person][:addresses][:address2] rescue nil) : (address.address2 rescue nil))
         }
     }
-
-    result = RestClient.post("http://#{@settings["dde_username"]}:#{@settings["dde_password"]}@#{@settings["dde_server"]}/process_confirmation", {:person => person, :target => "update"})
+    
+    if secure?
+     url = "https://#{@settings["dde_username"]}:#{@settings["dde_password"]}@#{@settings["dde_server"]}/process_confirmation"
+    else
+     url = "http://#{@settings["dde_username"]}:#{@settings["dde_password"]}@#{@settings["dde_server"]}/process_confirmation"
+    end
+    result = RestClient.post(url, {:person => person, :target => "update"})
 
     json = JSON.parse(result) rescue {}
 
@@ -464,8 +469,14 @@ class DdeController < ApplicationController
     @results = []
 
     if !@json.blank?
-
-      @results = RestClient.post("http://#{@settings["dde_username"]}:#{@settings["dde_password"]}@#{@settings["dde_server"]}/ajax_process_data", {:person => @json, :page => params[:page]}, {:accept => :json})
+    
+      if secure?
+        url = "https://#{@settings["dde_username"]}:#{@settings["dde_password"]}@#{@settings["dde_server"]}/ajax_process_data"
+      else
+        url = "http://#{@settings["dde_username"]}:#{@settings["dde_password"]}@#{@settings["dde_server"]}/ajax_process_data"
+      end
+      
+      @results = RestClient.post(url, {:person => @json, :page => params[:page]}, {:accept => :json})
 
     end
 
@@ -484,8 +495,14 @@ class DdeController < ApplicationController
         @results = result.to_json
 
         person = JSON.parse(@results) #["person"]
-
-        @results = RestClient.post("http://#{@settings["dde_username"]}:#{@settings["dde_password"]}@#{@settings["dde_server"]}/process_confirmation", {:person => person, :target => "select"})
+        
+        if secure?
+         url = "https://#{@settings["dde_username"]}:#{@settings["dde_password"]}@#{@settings["dde_server"]}/process_confirmation"
+        else
+         url = "http://#{@settings["dde_username"]}:#{@settings["dde_password"]}@#{@settings["dde_server"]}/process_confirmation"
+        end 
+        
+        @results = RestClient.post(url, {:person => person, :target => "select"})
 
         @dontstop = true
 
@@ -496,8 +513,14 @@ class DdeController < ApplicationController
         @results = result.to_json
 
         person = JSON.parse(@results) #["person"]
-
-        @results = RestClient.post("http://#{@settings["dde_username"]}:#{@settings["dde_password"]}@#{@settings["dde_server"]}/process_confirmation", {:person => person, :target => "select"})
+        
+        if secure?
+           url = "https://#{@settings["dde_username"]}:#{@settings["dde_password"]}@#{@settings["dde_server"]}/process_confirmation"
+        else
+           url = "http://#{@settings["dde_username"]}:#{@settings["dde_password"]}@#{@settings["dde_server"]}/process_confirmation"
+        end
+        
+        @results = RestClient.post(url, {:person => person, :target => "select"})
 
         @dontstop = true
 
@@ -562,8 +585,14 @@ class DdeController < ApplicationController
             @results = result.to_json
 
             person = JSON.parse(@results) #["person"]
-
-            @results = RestClient.post("http://#{@settings["dde_username"]}:#{@settings["dde_password"]}@#{@settings["dde_server"]}/process_confirmation", {:person => person, :target => "select"})
+            
+            if secure?
+              url = "https://#{@settings["dde_username"]}:#{@settings["dde_password"]}@#{@settings["dde_server"]}/process_confirmation"
+            else
+              url = "http://#{@settings["dde_username"]}:#{@settings["dde_password"]}@#{@settings["dde_server"]}/process_confirmation"
+            end
+            
+            @results = RestClient.post(url, {:person => person, :target => "select"})
 
             @dontstop = true
 
@@ -647,8 +676,13 @@ class DdeController < ApplicationController
     result = []
 
     if !person.blank?
-
-      results = RestClient.post("http://#{settings["dde_username"]}:#{settings["dde_password"]}@#{settings["dde_server"]}/ajax_process_data", {:person => person, :page => params[:page]}, {:accept => :json})
+      if secure?
+       url = "https://#{settings["dde_username"]}:#{settings["dde_password"]}@#{settings["dde_server"]}/ajax_process_data"
+      else
+       url = "http://#{settings["dde_username"]}:#{settings["dde_password"]}@#{settings["dde_server"]}/ajax_process_data"
+      end
+      
+      results = RestClient.post(url, {:person => person, :page => params[:page]}, {:accept => :json})
 
       result = JSON.parse(results)
 
@@ -721,7 +755,12 @@ class DdeController < ApplicationController
     target = "update" if target.blank?
 
     if !@json.blank?
-      @results = RestClient.post("http://#{settings["dde_username"]}:#{settings["dde_password"]}@#{settings["dde_server"]}/process_confirmation", {:person => @json, :target => target}, {:accept => :json})
+      if secure?
+       url = "https://#{settings["dde_username"]}:#{settings["dde_password"]}@#{settings["dde_server"]}/process_confirmation" 
+      else
+       url = "http://#{settings["dde_username"]}:#{settings["dde_password"]}@#{settings["dde_server"]}/process_confirmation" 
+      end
+      @results = RestClient.post(url, {:person => @json, :target => target}, {:accept => :json})
     end
 
     render :text => @results
@@ -760,8 +799,12 @@ class DdeController < ApplicationController
     if !search_hash["names"]["given_name"].blank? and !search_hash["names"]["family_name"].blank? and !search_hash["gender"].blank? # and result.length < pagesize
 
       pagesize += pagesize - result.length
-
-      remote = RestClient.post("http://#{settings["dde_username"]}:#{settings["dde_password"]}@#{settings["dde_server"]}/ajax_process_data", {:person => search_hash, :page => page, :pagesize => pagesize}, {:accept => :json})
+      if secure?
+        url = "https://#{settings["dde_username"]}:#{settings["dde_password"]}@#{settings["dde_server"]}/ajax_process_data"
+      else
+        url = "http://#{settings["dde_username"]}:#{settings["dde_password"]}@#{settings["dde_server"]}/ajax_process_data"
+      end
+      remote = RestClient.post(url, {:person => search_hash, :page => page, :pagesize => pagesize}, {:accept => :json})
 
       json = JSON.parse(remote)
 
@@ -866,11 +909,22 @@ class DdeController < ApplicationController
     @json = JSON.parse(params[:person]) rescue {}
 
     @settings = YAML.load_file("#{Rails.root}/config/dde_connection.yml")[Rails.env] # rescue {}
-
-    @results = RestClient.post("http://#{(@settings["dde_username"])}:#{(@settings["dde_password"])}@#{(@settings["dde_server"])}/ajax_process_data", {"person" => params["person"]})
+    
+    if secure?
+      url = "https://#{(@settings["dde_username"])}:#{(@settings["dde_password"])}@#{(@settings["dde_server"])}/ajax_process_data" 
+    else
+      url = "http://#{(@settings["dde_username"])}:#{(@settings["dde_password"])}@#{(@settings["dde_server"])}/ajax_process_data" 
+    end
+          
+    @results = RestClient.post(url, {"person" => params["person"]})
 
     render :layout => "ts"
 
+  end
+  
+  def secure?
+     @settings = YAML.load_file("#{Rails.root}/config/dde_connection.yml")[Rails.env]
+     secure = @settings["secure_connection"] rescue false
   end
 
   def duplicates
@@ -1042,10 +1096,14 @@ class DdeController < ApplicationController
     data["Identifiers"] = JSON.parse(data["Identifiers"]) if data["Identifiers"].class.to_s.downcase == "string"
 
     @settings = YAML.load_file("#{Rails.root}/config/dde_connection.yml")[Rails.env] # rescue {}
-
-    result = RestClient.post("http://#{(@settings["dde_username"])}:#{(@settings["dde_password"])}@#{(@settings["dde_server"])}/merge_duplicates", {"data" => data.to_json}, {:content_type => :json}) # rescue nil
-
-    # raise result.inspect  
+    
+    if secure?
+      url = "https://#{(@settings["dde_username"])}:#{(@settings["dde_password"])}@#{(@settings["dde_server"])}/merge_duplicates"
+    else
+      url = "http://#{(@settings["dde_username"])}:#{(@settings["dde_password"])}@#{(@settings["dde_server"])}/merge_duplicates"
+    end
+    
+    result = RestClient.post(url, {"data" => data.to_json}, {:content_type => :json}) # rescue nil
 
     if !result["success"].nil?
 
