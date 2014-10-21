@@ -4,6 +4,18 @@ class DdeController < ApplicationController
 
   def index
     session[:cohort] = nil
+
+    @settings = YAML.load_file("#{Rails.root}/config/dde_connection.yml")[Rails.env] rescue {}
+
+    application_name = @settings["application_name"].strip rescue ""
+    return_uri = session[:return_uri]
+
+    if !return_uri.blank? && application_name.match("bart")
+      session[:return_uri] = []
+      redirect_to return_uri.to_s
+      return
+    end
+
     @facility = Location.current_health_center.name rescue ''
 
     @location = Location.find(session[:location_id]).name rescue ""
@@ -15,8 +27,6 @@ class DdeController < ApplicationController
     @user = PatientService.name(@person)
 
     @roles = current_user.user_roles.collect { |r| r.role } rescue []
-
-    @settings = YAML.load_file("#{Rails.root}/config/dde_connection.yml")[Rails.env] rescue {}
 
     render :template => 'dde/index', :layout => false
   end
