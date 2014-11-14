@@ -22,9 +22,9 @@ class DdeController < ApplicationController
 
     @date = session[:datetime].to_date rescue Date.today.to_date
 
-    @person = Person.find_by_person_id(current_user.person_id)
+    @person = Person.find_by_person_id(current_user.person_id) rescue nil
 
-    @user = PatientService.name(@person)
+    @user = PatientService.name(@person) rescue nil
 
     @roles = current_user.user_roles.collect { |r| r.role } rescue []
 
@@ -1321,6 +1321,27 @@ class DdeController < ApplicationController
       "<li value=\"#{v.name}\">#{v.name}</li>"
     end
     render :text => nationalities.join('') + "<li value='Other'>Other</li>" and return
+  end
+
+  def family_names
+    searchname("family_name", params[:search_string])
+  end
+
+  def given_names
+    searchname("given_name", params[:search_string])
+  end
+
+  def family_name2
+    searchname("family_name2", params[:search_string])
+  end
+
+  def middle_name
+    searchname("middle_name", params[:search_string])
+  end
+
+  def searchname(field_name, search_string)
+    @names = PersonNameCode.find_most_common(field_name, search_string).collect{|person_name| person_name.send(field_name)} # rescue []
+    render :text => "<li>" + @names.map{|n| n } .join("</li><li>") + "</li>"
   end
 
 end

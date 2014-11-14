@@ -1,5 +1,6 @@
   
   # ------------------------------- INSTALLATION GENERATED ----------------------------------------------------
+  map.root :controller => "dde"
   map.clinic  '/clinic', :controller => 'dde', :action => 'index'
   map.duplicates  '/duplicates', :controller => 'dde', :action => 'duplicates'
   map.dde_search_by_name  '/dde_search_by_name', :controller => 'dde', :action => 'search_by_name'

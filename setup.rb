@@ -266,6 +266,7 @@ def modify_routes(root)
     inserted = false
     
     filters = {
+      "map.root" => true,
       "map.clinic" => true,
       "map.process_result" => true,
       "map.process_data" => true,
