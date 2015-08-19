@@ -8,7 +8,15 @@
         
     <script type="text/javascript">
       <!--
-      
+
+      var helpLinks = {
+          "Add Patient": "<%= @settings["help_base_url"] rescue "" %>add_patient",
+          "Cancel Operation": "<%= @settings["help_base_url"] rescue "" %>cancel",
+          "Find Patient": "<%= @settings["help_base_url"] rescue "" %>find_patient",
+          "New Patient": "<%= @settings["help_base_url"] rescue "" %>new_patient",
+          "Select Patient": "<%= @settings["help_base_url"] rescue "" %>select_patient"
+      };
+
       var json = <%= {
               "national_id" => nil,
               "application" => "#{@settings["application_name"]}",
@@ -92,4 +100,5 @@
       
       //-->
     </script>
-    
+
+    <script src="/javascripts/bht-help.js" defer></script>

@@ -131,7 +131,9 @@ def install(root)
       "app/models/dde_traditional_authority.rb",
       "app/models/dde_village.rb",
       "app/models/dde_nationality.rb",
-      "app/models/dde_country.rb"
+      "app/models/dde_country.rb",
+      "public/javascripts/spin.js",
+      "public/javascripts/bht-help.js"
     ]  
     # "app/views/dde/index.html.erb",
       
@@ -475,7 +477,9 @@ def uninstall(root)
       "app/models/dde_traditional_authority.rb",
       "app/models/dde_village.rb",
       "app/models/dde_nationality.rb",
-      "app/models/dde_country.rb"
+      "app/models/dde_country.rb",
+      "public/javascripts/spin.js",
+      "public/javascripts/bht-help.js"
     ]
   
   if File.exists?("#{root}/app/views/dde")

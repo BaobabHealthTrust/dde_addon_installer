@@ -13,3 +13,4 @@ log/
 script/
 test/
 *~
+.idea/
