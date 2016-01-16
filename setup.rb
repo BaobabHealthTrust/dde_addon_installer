@@ -1,5 +1,7 @@
 #!/usr/bin/env ruby
+require "rubygems"
 require "fileutils"
+require "yaml"
 
 def usage
   puts "\nUsage:\n\t#{__FILE__} PATH ACTION\n\twhere:\n\t\tPATH: is a {valid folder}\n\t\tACTION: is either {install | uninstall}\n\n"
@@ -45,9 +47,67 @@ def install(root)
     exit
   end
   
+  if !File.exists?("#{root}/config/database.yml")
+  
+    puts "\nTarget folder does not seem to be have a valid defined database configuration"
+    
+    exit
+  
+  end
+  
   puts " OK"
   
   puts "Starting installation ..."
+  
+  puts "Loading data into database..."
+  
+  settings = YAML.load_file("#{root}/config/database.yml") rescue {}
+  
+  if settings["development"].nil? and settings["production"].nil? and settings["test"].nil?
+  
+    puts "\nTarget folder does not seem to be have a valid defined database configuration"
+    
+    exit
+  
+  end
+  
+  if !settings["development"].nil?
+  
+    puts "Loading 'development' database..."
+    
+    `mysql -h #{settings["development"]["host"]} -u #{settings["development"]["username"]} -p#{settings["development"]["password"]} #{settings["development"]["database"]} < ./db/villages.sql`
+  
+    `mysql -h #{settings["development"]["host"]} -u #{settings["development"]["username"]} -p#{settings["development"]["password"]} #{settings["development"]["database"]} < ./db/person_attribute_type.sql`
+    
+    `mysql -h #{settings["development"]["host"]} -u #{settings["development"]["username"]} -p#{settings["development"]["password"]} #{settings["development"]["database"]} < ./db/countries.sql`
+  
+  end
+  
+  if !settings["production"].nil?
+    
+    puts "Loading 'production' database..."
+    
+    `mysql -h #{settings["production"]["host"]} -u #{settings["production"]["username"]} -p#{settings["production"]["password"]} #{settings["production"]["database"]} < ./db/villages.sql`
+  
+    `mysql -h #{settings["production"]["host"]} -u #{settings["production"]["username"]} -p#{settings["production"]["password"]} #{settings["production"]["database"]} < ./db/person_attribute_type.sql`
+  
+    `mysql -h #{settings["production"]["host"]} -u #{settings["production"]["username"]} -p#{settings["production"]["password"]} #{settings["production"]["database"]} < ./db/countries.sql`
+  
+  end
+  
+  if !settings["test"].nil?
+    
+    puts "Loading 'test' database..."
+    
+    `mysql -h #{settings["test"]["host"]} -u #{settings["test"]["username"]} -p#{settings["test"]["password"]} #{settings["test"]["database"]} < ./db/villages.sql`
+  
+    `mysql -h #{settings["test"]["host"]} -u #{settings["test"]["username"]} -p#{settings["test"]["password"]} #{settings["test"]["database"]} < ./db/person_attribute_type.sql`
+  
+    `mysql -h #{settings["test"]["host"]} -u #{settings["test"]["username"]} -p#{settings["test"]["password"]} #{settings["test"]["database"]} < ./db/countries.sql`
+  
+  end
+  
+  puts "Done loading data."
   
   copies = [
       "app/views/layouts/ts.html.erb",
@@ -59,9 +119,21 @@ def install(root)
       "app/views/dde/process_scan_data.html.erb",
       "app/views/dde/search.html.erb",
       "app/views/dde/send_to_dde.html.erb",
+      "app/views/dde/duplicates.html.erb",
       "app/controllers/dde_controller.rb",
       "config/dde_connection.yml.example",
-      "lib/dde.rb"
+      "lib/dde.rb",
+      "public/images/female.png",
+      "public/images/male.png",
+      "config/globals.yml.example",
+      "app/models/dde_district.rb",
+      "app/models/dde_region.rb",
+      "app/models/dde_traditional_authority.rb",
+      "app/models/dde_village.rb",
+      "app/models/dde_nationality.rb",
+      "app/models/dde_country.rb",
+      "public/javascripts/spin.js",
+      "public/javascripts/bht-help.js"
     ]  
     # "app/views/dde/index.html.erb",
       
@@ -185,7 +257,7 @@ end
 
 def modify_routes(root)
   
-  if !File.exists?("#{root}/config/routes.backup.rb") and File.exists?("config/routes.rb")
+  if !File.exists?("#{root}/config/routes.backup.rb") and File.exists?("config/routes.rb.additions")
   
     puts "Renaming original routes file ..."
     
@@ -196,6 +268,7 @@ def modify_routes(root)
     inserted = false
     
     filters = {
+      "map.root" => true,
       "map.clinic" => true,
       "map.process_result" => true,
       "map.process_data" => true,
@@ -221,7 +294,7 @@ def modify_routes(root)
         
           puts "Inserting custom block ..."
         
-          input = File.open("config/routes.rb", "r").read
+          input = File.open("config/routes.rb.additions", "r").read
           
           string = string + input
         
@@ -237,7 +310,7 @@ def modify_routes(root)
         
           puts "Inserting custom block ..."
         
-          input = File.open("config/routes.rb", "r").read
+          input = File.open("config/routes.rb.additions", "r").read
           
           string = string + input
         
@@ -333,9 +406,53 @@ def uninstall(root)
     exit
   end
   
+  if !File.exists?("#{root}/config/database.yml")
+  
+    puts "\nTarget folder does not seem to be have a valid defined database configuration"
+    
+    exit
+  
+  end
+  
   puts " OK"
   
   puts "Starting removal ..."
+  
+  puts "Loading data into database..."
+  
+  settings = YAML.load_file("#{root}/config/database.yml") rescue {}
+  
+  if settings["development"].nil? and settings["production"].nil? and settings["test"].nil?
+  
+    puts "\nTarget folder does not seem to be have a valid defined database configuration"
+    
+    exit
+  
+  end
+  
+  if !settings["development"].nil?
+  
+    puts "Unloading 'development' database..."
+    
+    `mysql -h #{settings["development"]["host"]} -u #{settings["development"]["username"]} -p#{settings["development"]["password"]} #{settings["development"]["database"]} < ./db/drop_villages.sql`
+  
+  end  
+  
+  if !settings["production"].nil?
+  
+    puts "Unloading 'production' database..."
+    
+    `mysql -h #{settings["production"]["host"]} -u #{settings["production"]["username"]} -p#{settings["production"]["password"]} #{settings["production"]["database"]} < ./db/drop_villages.sql`
+  
+  end
+  
+  if !settings["test"].nil?
+  
+    puts "Unloading 'test' database..."
+    
+    `mysql -h #{settings["test"]["host"]} -u #{settings["test"]["username"]} -p#{settings["test"]["password"]} #{settings["test"]["database"]} < ./db/drop_villages.sql`
+  
+  end
   
   copies = [
       "app/views/layouts/ts.html.erb",
@@ -348,9 +465,21 @@ def uninstall(root)
       "app/views/dde/process_scan_data.html.erb",
       "app/views/dde/search.html.erb",
       "app/views/dde/send_to_dde.html.erb",
+      "app/views/dde/duplicates.html.erb",
       "app/controllers/dde_controller.rb",
       "config/dde_connection.yml.example",
-      "lib/dde.rb"
+      "lib/dde.rb",
+      "public/images/female.png",
+      "public/images/male.png",
+      "config/globals.yml.example",
+      "app/models/dde_district.rb",
+      "app/models/dde_region.rb",
+      "app/models/dde_traditional_authority.rb",
+      "app/models/dde_village.rb",
+      "app/models/dde_nationality.rb",
+      "app/models/dde_country.rb",
+      "public/javascripts/spin.js",
+      "public/javascripts/bht-help.js"
     ]
   
   if File.exists?("#{root}/app/views/dde")
@@ -461,9 +590,15 @@ def modify_clinic_index_page(root)
           end
         
           if !inserted
-                      
-              string = string + stub
-              
+
+              output = '<html><head><title>Clinic Index</title><!--script type="text/javascript" language="javascript" ' +
+                  'src="/javascripts/dashboard.js" ></script--><script language="javascript" type="text/javascript" ' +
+                  'src="/touchscreentoolkit/lib/javascripts/touchScreenToolkit.js" defer></script></head><body>'
+
+              output = output + string + stub + "</body></html>"
+
+              string = output
+
               inserted = true            
           
           end

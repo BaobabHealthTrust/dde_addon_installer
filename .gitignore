@@ -1,1 +1,20 @@
+<<<<<<< HEAD
 config/dde_connection.yml
+=======
+Rakefile
+app/controllers/application_controller.rb
+app/helpers/
+config/boot.rb
+config/database.yml
+config/environment.rb
+config/environments/
+config/initializers/
+config/locales/
+config/routes.rb
+doc/
+log/
+script/
+test/
+*~
+.idea/
+>>>>>>> b31b1c50581d87df55c0f7d1f9e9e0dc5689fab3
