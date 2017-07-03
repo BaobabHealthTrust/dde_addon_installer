@@ -276,11 +276,12 @@ module DDE
 
   def self.set_identifier(identifier, value, patient_id)
     patient_identifier_type = PatientIdentifierType.find_by_name(identifier).id.present? rescue nil
+
     if value.present? && patient_identifier.present?
 
       PatientIdentifier.create(:patient_id => patient_id, 
                                :identifier => value,
-                               :identifier_type => patient_identifier_type
+                               :identifier_type => patient_identifier_type)
 
     end
     
