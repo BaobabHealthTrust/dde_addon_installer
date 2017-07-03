@@ -168,10 +168,9 @@ module DDE
          
           idtype = PatientIdentifierType.find_by_name(identifier.keys[0]).id rescue nil
   
-          if !idtype.blank?
-
+          if (idtype.present? || defidtype.present?) && identifier[identifier.keys[0]].present?
             uuid = PatientIdentifier.find_by_sql("SELECT UUID() uuid")
-
+          
             PatientIdentifier.create(
                 "patient_id" => patient.id,
                 "identifier" => identifier[identifier.keys[0]],
@@ -276,8 +275,15 @@ module DDE
   end
 
   def self.set_identifier(identifier, value, patient_id)
-    PatientIdentifier.create(:patient_id => patient_id, :identifier => value,
-                             :identifier_type => (PatientIdentifierType.find_by_name(identifier).id))
+    patient_identifier_type = PatientIdentifierType.find_by_name(identifier).id.present? rescue nil
+    if value.present? && patient_identifier.present?
+
+      PatientIdentifier.create(:patient_id => patient_id, 
+                               :identifier => value,
+                               :identifier_type => patient_identifier_type
+
+    end
+    
   end
 
   def self.create_from_form(params)
